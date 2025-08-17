@@ -23,14 +23,21 @@ enum class Orientation {
 
 class Car {
 public:
-    int length;
-    Car() : length(2) {}
+    int carLength;
+    std::vector<int> carVector;
+    Car() : carLength(2) {carVector = initalizeCarVector();}
+
+    void printCar() {
+        for (int i : carVector) {
+            std::cout << i;
+        }
+    }
 
 private:
-    static std:: vector<int> initalizeCarVector(int length) {
-        std:: vector<int> carVector(length);
-        for (int i = 0; i < length; i++) {
-            carVector[i] = 'c';
+     std:: vector<int> initalizeCarVector() {
+        std:: vector<int> carVector(carLength);
+        for (int & i : carVector) {
+            i = 'c';
         }
         return carVector;
     }
@@ -52,7 +59,9 @@ class Board {
         }
     }
 
-    // void placePiece()
+    void placePiece(Car &car, std:: vector<std:: vector<int>> &board) {
+
+    }
 
 private:
     std:: vector<std:: vector<int>> initalizeBoard() {
@@ -75,7 +84,11 @@ int main() {
     std:: vector<int> Truck = {1,2,3};
 
     Car car;
-    std:: cout << car.length << std::endl;
+    std:: cout << "Car length "<< car.carLength << std::endl;
+    std:: cout << "Car Vector ";
+    car.printCar();
+
+    std:: cout << std:: endl;
 
     Board boardclass(BOARD_HEIGHT, BOARD_WIDTH);
 
