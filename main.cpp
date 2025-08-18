@@ -29,7 +29,7 @@ public:
 
     void printCar() {
         for (char i : carVector) {
-            std::cout << i;
+            std:: cout << i;
         }
     }
 
@@ -51,7 +51,7 @@ public:
 
     void printTruck() {
         for (char i : truckVector) {
-            std::cout << i;
+            std:: cout << i;
         }
     }
 
@@ -72,12 +72,18 @@ class Board {
     std::vector<std::vector<char>> grid;
     Board(int passedHeight, int passedWidth) : height(passedHeight), width(passedWidth) {grid = initalizeBoard();}
 
-    void printBoard() {
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                std::cout << grid[i][j] << " ";
+    void newPrintBoard() {
+        for (auto row : grid) {
+            for (auto element : row) {
+                if (element == 'c') {
+                    std:: cout << "\033[31m" << element << "\033[0m" << " ";
+                } else if (element == 't') {
+                    std:: cout << "\033[32m" << element << "\033[0m" << " ";
+                } else {
+                    std:: cout << element << " ";
+                }
             }
-            std::cout << std::endl;
+            std:: cout << std::endl;
         }
     }
 
@@ -109,6 +115,23 @@ class Board {
             }
         }
         return inBounds;
+    }
+
+    bool canPlacePieceVertical (std:: vector<char> &pieceVector, std:: vector< std:: vector<char>> &board, int xCoord, int yCoord, bool isVertical, int direction) {
+        if (isInbounds(pieceVector, board, xCoord, yCoord, isVertical) == false) {
+            return false;
+        }
+
+        for (int i = 0; i < board.size(); i++) {
+            int newY = yCoord * direction;
+            if (newY < 0 || newY >= board.size()) {
+                return false;
+            }
+            if (board[newY][xCoord] != '0') {
+                return false;
+            }
+        }
+        return true;
     }
 
     //currently places the car piece horizontally
@@ -178,19 +201,34 @@ class Board {
             return;
         }
 
-        //board.size() = rows
-        //board[0].size = cols
-            std:: cout << "Can place piece" << std:: endl;
-        for (int row = 0; row < board.size(); row++) {
-            for (int col = 0; col < board[0].size(); col++) {
-                if (board[yCoord][xCoord] == '0') {
-                    board[yCoord][xCoord] = truck.truckVector[0];
+        if (canPlacePieceVertical(truck.truckVector, board, xCoord, yCoord, true, 1)) {
+            for (int row = 0; row < board.size(); row++) {
+                for (int col = 0; col < board[0].size(); col++) {
+                    if (board[yCoord][xCoord] == '0') {
+                        board[yCoord][xCoord] = truck.truckVector[0];
+                    }
+                    if (board[yCoord + 1][xCoord] == '0') {
+                        board[yCoord + 1][xCoord] = truck.truckVector[1];
+                    }
+                    if (board[yCoord + 2][xCoord] == '0') {
+                        board[yCoord + 2][xCoord] = truck.truckVector[2];
+                    }
                 }
-                if (board[yCoord + 1][xCoord] == '0') {
-                    board[yCoord + 1][xCoord] = truck.truckVector[1];
-                }
-                if (board[yCoord + 2][xCoord] == '0') {
-                    board[yCoord + 2][xCoord] = truck.truckVector[2];
+            }
+        }
+
+        if (canPlacePieceVertical(truck.truckVector, board, xCoord, yCoord, true, -1)) {
+            for (int row = 0; row < board.size(); row++) {
+                for (int col = 0; col < board[0].size(); col++) {
+                    if (board[yCoord][xCoord] == '0') {
+                        board[yCoord][xCoord] = truck.truckVector[0];
+                    }
+                    if (board[yCoord - 1][xCoord] == '0') {
+                        board[yCoord - 1][xCoord] = truck.truckVector[1];
+                    }
+                    if (board[yCoord - 2][xCoord] == '0') {
+                        board[yCoord - 2][xCoord] = truck.truckVector[2];
+                    }
                 }
             }
         }
@@ -223,18 +261,18 @@ int main() {
     std:: cout << "Initialized Board game" << std:: endl;
     Board board(BOARD_HEIGHT, BOARD_WIDTH);
 
-    board.printBoard();
+    board.newPrintBoard();
 
     std:: cout <<std:: endl;
 
 
     board.placeCarPiece(car, board.grid, 0, 0);
-    board.placeCarPieceVertical(car, board.grid, 1, 6);
+    board.placeCarPieceVertical(car, board.grid, 1, 4);
 
     board.placeTruckPiece(truck, board.grid, 2, 2);
-    board.placeTruckPieceVertical(truck, board.grid, 5, 6);
+    board.placeTruckPieceVertical(truck, board.grid, 5, 1);
 
 
-    board.printBoard();
+    board.newPrintBoard();
 
 }
