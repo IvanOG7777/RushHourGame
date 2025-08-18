@@ -8,19 +8,6 @@
 constexpr int BOARD_HEIGHT = 6;
 constexpr int BOARD_WIDTH = 6;
 
-// enum class Orientation {
-//     Horizontal,
-//     Vertical
-// };
-
-// struct Vehicle {
-//     int id;
-//     int length;
-//     Orientation orientation;
-//     int row;
-//     int column;
-// };
-
 class Car {
 public:
     int carLength;
@@ -87,8 +74,7 @@ public:
         }
     }
 
-    bool isInbounds(std::vector<char> &pieceVector, std::vector<std::vector<char> > &board, int xCoord, int yCoord,
-                    bool isVertical) {
+    bool isInbounds(std::vector<char> &pieceVector, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical) {
         bool inBounds = false;
 
         if (board.empty() || board[0].empty()) {
@@ -140,9 +126,25 @@ public:
         return inBounds;
     }
 
+    bool collides(std:: vector<char> &pieceVector, std::vector<std::vector<char>> &board, int xCoord, int yCoord, bool isVertical) {
+        bool collision = false;
+        if (isInbounds(pieceVector, board, xCoord, yCoord, isVertical) == false) {
+            return false;
+        }
+
+        for (int i = 0; i < board.size(); i++) {
+            for (int j = 0; j < board[0].size(); j++) {
+                if (board[yCoord][xCoord] != '0') {
+                    collision = true;
+                }
+            }
+        }
+        return collision;
+    }
+
     //currently places the car piece horizontally
     void placeCarPiece(Car &car, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical) {
-        if (isInbounds(car.carVector, board, xCoord, yCoord, isVertical) == false) {
+        if (collides(car.carVector, board, xCoord, yCoord, isVertical) == false) {
             std::cout << "Cant place piece" << std::endl;
             return;
         }
@@ -202,7 +204,7 @@ public:
 
     //currently places the truck piece horizontally
     void placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical) {
-        if (isInbounds(truck.truckVector, board, xCoord, yCoord, isVertical) == false) {
+        if (collides(truck.truckVector, board, xCoord, yCoord, isVertical) == false) {
             std::cout << "Cant place piece" << std::endl;
             return;
         }
@@ -304,7 +306,8 @@ int main() {
 
 
     board.placeCarPiece(car, board.grid, 0, 0, false);
-    board.placeCarPiece(car, board.grid, 1, 4, true);
+    board.placeCarPiece(car, board.grid, 1, 1, true);
+    board.placeCarPiece(car, board.grid, 5, 0, true);
 
     board.placeTruckPiece(truck, board.grid, 0, 2, false);
     board.placeTruckPiece(truck, board.grid, 5, 5, false);
