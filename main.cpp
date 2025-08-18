@@ -129,13 +129,65 @@ public:
     bool collides(std:: vector<char> &pieceVector, std::vector<std::vector<char>> &board, int xCoord, int yCoord, bool isVertical) {
         bool collision = false;
         if (isInbounds(pieceVector, board, xCoord, yCoord, isVertical) == false) {
-            return false;
+            return true;
         }
 
-        for (int i = 0; i < board.size(); i++) {
-            for (int j = 0; j < board[0].size(); j++) {
-                if (board[yCoord][xCoord] != '0') {
-                    collision = true;
+        const int rows = static_cast<int>(board.size());
+        const int cols = static_cast<int>(board[0].size());
+        const int len  = static_cast<int>(pieceVector.size());
+
+        if (isVertical == false) {
+            if (xCoord + len - 1 < cols) {
+                collision = false;
+                for (int k = 0; k < len; k++) {
+                    if (board[yCoord][xCoord + k] != '0') {
+                        collision = true;
+                        break;
+                    }
+                }
+                if (collision == false) {
+                    return collision;
+                }
+            }
+
+            if (xCoord - (len - 1) >= 0 ) {
+                collision = false;
+                for (int k = 0; k < len; k++) {
+                    if (board[yCoord][xCoord - k] != '0') {
+                        collision = true;
+                        break;
+                    }
+                }
+                if (collision == false) {
+                    return collision;
+                }
+            }
+        }
+
+        if (isVertical == true) {
+            if (yCoord + len - 1 < rows) {
+                collision = false;
+                for (int k = 0; k < len; k++) {
+                    if (board[yCoord + k][xCoord] != '0') {
+                        collision = true;
+                        break;
+                    }
+                }
+                if (collision == false) {
+                    return collision;
+                }
+            }
+
+            if (yCoord - (len - 1) >= 0 ) {
+                collision = false;
+                for (int k = 0; k < len; k++) {
+                    if (board[yCoord - k][xCoord] != '0') {
+                        collision = true;
+                        break;
+                    }
+                }
+                if (collision == false) {
+                    return collision;
                 }
             }
         }
@@ -144,8 +196,8 @@ public:
 
     //currently places the car piece horizontally
     void placeCarPiece(Car &car, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical) {
-        if (collides(car.carVector, board, xCoord, yCoord, isVertical) == false) {
-            std::cout << "Cant place piece" << std::endl;
+        if (collides(car.carVector, board, xCoord, yCoord, isVertical) == true) {
+            std::cout << "Cant place piece at:" << xCoord << ',' << yCoord << std::endl;
             return;
         }
 
@@ -204,8 +256,8 @@ public:
 
     //currently places the truck piece horizontally
     void placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical) {
-        if (collides(truck.truckVector, board, xCoord, yCoord, isVertical) == false) {
-            std::cout << "Cant place piece" << std::endl;
+        if (collides(truck.truckVector, board, xCoord, yCoord, isVertical) == true) {
+            std::cout << "Cant place piece at:" << xCoord << ',' << yCoord << std::endl;
             return;
         }
 
@@ -309,7 +361,7 @@ int main() {
     board.placeCarPiece(car, board.grid, 1, 1, true);
     board.placeCarPiece(car, board.grid, 5, 0, true);
 
-    board.placeTruckPiece(truck, board.grid, 0, 2, false);
+    board.placeTruckPiece(truck, board.grid, 0, 2, true);
     board.placeTruckPiece(truck, board.grid, 5, 5, false);
 
 
