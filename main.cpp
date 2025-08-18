@@ -89,6 +89,7 @@ class Board {
 
     bool isInbounds (std:: vector<char> &pieceVector, std:: vector< std:: vector<char>> &board, int xCoord, int yCoord, bool isVertical) {
         bool inBounds = false;
+        int negativeDirection = -1;
 
         if (board.empty() || board[0].empty()) {
             return inBounds;
@@ -97,7 +98,15 @@ class Board {
         int row = static_cast<int>(board.size());
         int col = static_cast<int>(board[0].size());
         int length = static_cast<int>(pieceVector.size());
-        if ((isVertical == false)) { // checks the horizontal bounds of the piece that is being placed
+        if ((isVertical == false)) { // checks the horizontal bounds of the piece that is being placed only checks piece being printed left to right
+            for (int i = 0; i < length; i++) {
+                int newX = x + i * negativeDirection;
+                if (newX < 0 || newX >= col) {
+                    inBounds = false;
+                    return inBounds;
+                }
+            }
+
             if (
                 (yCoord >= 0 && yCoord < row) &&
                 (xCoord >= 0) &&
@@ -105,7 +114,15 @@ class Board {
                 ) {
                 inBounds = true;
             }
-        } else if (isVertical == true) { // checks the vertical bounds of the piece that is being placed
+        } else if (isVertical == true) { // checks the vertical bounds of the piece that is being placed only checks piece being printed up to down
+            for (int i = 0; i < length; i++) {
+                int newY = y + i * negativeDirection;
+                if (newY < 0 || newY >= row) {
+                    inBounds = false;
+                    return inBounds;
+                }
+            }
+
             if (
                 (xCoord >= 0 && xCoord < col) &&
                 (yCoord >= 0) &&
@@ -114,24 +131,8 @@ class Board {
                 inBounds = true;
             }
         }
+
         return inBounds;
-    }
-
-    bool canPlacePieceVertical (std:: vector<char> &pieceVector, std:: vector< std:: vector<char>> &board, int xCoord, int yCoord, bool isVertical, int direction) {
-        if (isInbounds(pieceVector, board, xCoord, yCoord, isVertical) == false) {
-            return false;
-        }
-
-        for (int i = 0; i < board.size(); i++) {
-            int newY = yCoord * direction;
-            if (newY < 0 || newY >= board.size()) {
-                return false;
-            }
-            if (board[newY][xCoord] != '0') {
-                return false;
-            }
-        }
-        return true;
     }
 
     //currently places the car piece horizontally
