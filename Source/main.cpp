@@ -3,6 +3,7 @@
 //
 #include <iostream>
 #include <vector>
+#include "../Headers/Car.h"
 
 
 constexpr int BOARD_HEIGHT = 6;
