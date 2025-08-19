@@ -6,7 +6,7 @@
 #define BOARD_H
 #include "../Headers/Car.h"
 #include "../Headers/Truck.h"
-
+#include <vector>
 
 class Board {
     public:
