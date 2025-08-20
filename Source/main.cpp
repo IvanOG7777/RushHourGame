@@ -20,6 +20,8 @@ int main() {
     Truck truck;
     Board board(BOARD_HEIGHT, BOARD_WIDTH);
 
+    board.placeTruckPiece(truck, board.grid, 2, 3, false);
+
 
         while (running && !hasPlacedPiece) {
             board.movePieceDynamically(car.carVector, board.grid, x, y, isVertical, 0, 0);
@@ -64,8 +66,6 @@ int main() {
                 }
                 continue; 
             }
-
-            system("cls");
 
             if (dx != 0 || dy != 0) {
                 board.movePieceDynamically(car.carVector, board.grid, x, y, isVertical, dx, dy);

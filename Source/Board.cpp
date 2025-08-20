@@ -181,6 +181,8 @@ void Board::movePieceDynamically(std::vector<char>& pieceVector, std::vector<std
         }
     }
 
+    system("cls");
+
     for (auto row : tempBoard) {
         for (auto element : row) {
             if (element == 'c') {
