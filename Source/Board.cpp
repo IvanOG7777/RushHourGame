@@ -143,6 +143,13 @@ bool Board::collides(std::vector<char> &pieceVector, std::vector<std::vector<cha
         return collision;
 }
 
+void Board::movePiece(std::vector<char>& pieceVector, std::vector<std::vector<char>>& board, int xCoord, int yCoord, bool isVertical) {
+    auto tempBoard = board;
+    int row = board.size();
+    int cols = board[0].size();
+
+}
+
 void Board::placeCarPiece(Car &car, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical) {
      if (collides(car.carVector, board, xCoord, yCoord, isVertical) == true) {
             std::cout << "Cant place piece at:" << xCoord << ',' << yCoord << std::endl;

@@ -21,6 +21,7 @@ int main() {
     board.placeCarPiece(car, board.grid, 0, 0, false);
     board.placeCarPiece(car, board.grid, 1, 1, true);
     board.placeCarPiece(car, board.grid, 5, 0, true);
+    
 
     board.placeTruckPiece(truck, board.grid, 0, 2, true);
     board.placeTruckPiece(truck, board.grid, 5, 5, false);

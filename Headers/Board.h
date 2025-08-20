@@ -25,6 +25,8 @@ class Board {
 
     void placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical);
 
+    void movePiece(std::vector<char>& pieceVector, std::vector<std::vector<char>>& board, int xCoord, int yCoord, bool isVertical);
+
     private:
     std::vector<std::vector<char>> initializeBoard();
 };
