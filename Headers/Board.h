@@ -25,7 +25,7 @@ class Board {
 
     void placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical);
 
-    void movePiece(std::vector<char>& pieceVector, std::vector<std::vector<char>>& board, int xCoord, int yCoord, bool isVertical);
+    void movePieceDynamically(std::vector<char>& pieceVector, std::vector<std::vector<char>>& board, int &xCoord, int &yCoord, bool isVertical, int dx, int dy);
 
     private:
     std::vector<std::vector<char>> initializeBoard();

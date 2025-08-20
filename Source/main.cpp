@@ -6,6 +6,8 @@
 #include "../Headers/Constants.h"
 
 int main() {
+
+    bool hasPlacedPiece = false; 
     Car car;
     Truck truck;
 

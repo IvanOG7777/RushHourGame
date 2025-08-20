@@ -143,11 +143,58 @@ bool Board::collides(std::vector<char> &pieceVector, std::vector<std::vector<cha
         return collision;
 }
 
-void Board::movePiece(std::vector<char>& pieceVector, std::vector<std::vector<char>>& board, int xCoord, int yCoord, bool isVertical) {
+void Board::movePieceDynamically(std::vector<char>& pieceVector, std::vector<std::vector<char>>& board, int &xCoord, int &yCoord, bool isVertical, int dx, int dy) {
     auto tempBoard = board;
-    int row = board.size();
+    int rows = board.size();
     int cols = board[0].size();
+    int length = pieceVector.size();
 
+    int newX = xCoord + dx;
+    int newY = yCoord + dy;
+
+
+
+    if (isVertical == true) {
+        if (newY < 0 || (newY + length - 1) >= rows) return;
+        if (newX < 0 || newX >= cols) return;
+    }
+
+    if (isVertical == false) {
+        if (newX < 0 || (newX + length - 1) >= cols) return;
+        if (newY < 0 || newY >= rows) return;
+    }
+
+    if (collides(pieceVector, board, newX, newY, isVertical) == true) return;
+
+    xCoord = newX;
+    yCoord = newY;
+
+    if (isVertical == true) {
+        for (int k = 0; k < length; k++) {
+            tempBoard[yCoord + k][xCoord] = pieceVector[k];
+        }
+    }
+
+    if (isVertical == false) {
+        for (int k = 0; k < length; k++) {
+            tempBoard[yCoord][xCoord + k] = pieceVector[k];
+        }
+    }
+
+    for (auto row : tempBoard) {
+        for (auto element : row) {
+            if (element == 'c') {
+                std::cout << "\033[31m" << element << "\033[0m" << " ";
+            }
+            else if (element == 't') {
+                std::cout << "\033[32m" << element << "\033[0m" << " ";
+            }
+            else {
+                std::cout << element << " ";
+            }
+        }
+        std::cout << std::endl;
+    }
 }
 
 void Board::placeCarPiece(Car &car, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical) {
