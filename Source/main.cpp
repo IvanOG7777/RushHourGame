@@ -19,10 +19,16 @@ int main() {
     int x = 0, y = 1;
     Truck truck(1);
     Board board(BOARD_HEIGHT, BOARD_WIDTH);
-    Board idBoard(BOARD_HEIGHT, BOARD_WIDTH);
-    
-    board.placeTruckPiece(truck, board.grid, idBoard.idGrid, 3, 1, false);
+
+    std::cout << "Charater Board" << std::endl;
+    board.printBoard();
+
+    std::cout << std::endl;
+
+    std::cout << "ID Board" << std::endl;
     board.printIdBoard();
+    
+  /*  board.placeTruckPiece(truck, board.grid, idBoard.idGrid, 3, 1, false);*/
 
 
 

@@ -12,7 +12,7 @@ public:
     int truckId;
     std:: vector<char> truckVector;
     void printTruck();
-    Truck(int passedId) : truckId(passedId) {};
+    Truck(int passedId);
 
 private:
     std:: vector<char> initializeTruck() const;

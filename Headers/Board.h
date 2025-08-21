@@ -36,7 +36,7 @@ class Board {
 
     private:
     std:: vector<std:: vector<char>> initializeBoard();
-    std::vector<std::vector<int>> initializeIdBoard();
+    std:: vector<std:: vector<int>> initializeIdBoard();
 };
 
 #endif //BOARD_H

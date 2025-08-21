@@ -7,10 +7,13 @@
 #include <iostream>
 #include <vector>
 
-Board::Board(int passedHeight, int passedWidth) : height(passedHeight), width(passedWidth) { grid = initializeBoard(); idGrid = initializeIdBoard(); }
+Board::Board(int passedHeight, int passedWidth) : height(passedHeight), width(passedWidth) { 
+    grid = initializeBoard();
+    idGrid = initializeIdBoard();
+}
 
 void Board::printBoard() {
-    for (auto row: grid) {
+    for (auto &row: grid) {
         for (auto element: row) {
             if (element == 'c') {
                 std::cout << "\033[31m" << element << "\033[0m" << " ";
@@ -25,11 +28,9 @@ void Board::printBoard() {
 }
 
 void Board::printIdBoard() {
-    for (auto row : idGrid) {
+    for (auto &row : idGrid) {
         for (auto element : row) {
-            if (element != 0) {
-                std::cout << element << " ";
-            }
+            std::cout << element << " ";
         }
         std::cout << std::endl;
     }
@@ -90,7 +91,7 @@ bool Board::collides(std::vector<char> &pieceVector, std::vector<std::vector<cha
 }
 
 void Board::movePieceDynamically(std::vector<char>& pieceVector, std::vector<std::vector<char>>& board, int &xCoord, int &yCoord, bool isVertical, int dx, int dy) {
-    auto tempBoard = board;
+    auto &tempBoard = board;
     int rows = board.size();
     int cols = board[0].size();
     int length = pieceVector.size();
@@ -129,7 +130,7 @@ void Board::movePieceDynamically(std::vector<char>& pieceVector, std::vector<std
 
     system("cls");
 
-    for (auto row : tempBoard) {
+    for (auto &row : tempBoard) {
         for (auto element : row) {
             if (element == 'c') {
                 std::cout << "\033[31m" << element << "\033[0m" << " ";
@@ -145,21 +146,21 @@ void Board::movePieceDynamically(std::vector<char>& pieceVector, std::vector<std
     }
 }
 
-void Board::grabPiece(std::vector<std::vector<char>>& board, int xCoord, int yCoord) {
-    int row = board.size();
-    int col = board[0].size();
-    bool canSelect = false;
-    char selectedCharacter;
-    
-    if (board[yCoord][xCoord] == '0') canSelect = false;
-
-    if (board[yCoord][xCoord] != '0') {
-        canSelect = true;
-        selectedCharacter = board[yCoord][xCoord];
-    }
-
-
-}
+//void Board::grabPiece(std::vector<std::vector<char>>& board, int xCoord, int yCoord) {
+//    int row = board.size();
+//    int col = board[0].size();
+//    bool canSelect = false;
+//    char selectedCharacter;
+//    
+//    if (board[yCoord][xCoord] == '0') canSelect = false;
+//
+//    if (board[yCoord][xCoord] != '0') {
+//        canSelect = true;
+//        selectedCharacter = board[yCoord][xCoord];
+//    }
+//
+//
+//}
 
 void Board::placeCarPiece(Car &car, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical) {
      if (collides(car.carVector, board, xCoord, yCoord, isVertical) == true) {
@@ -173,8 +174,8 @@ void Board::placeCarPiece(Car &car, std::vector<std::vector<char> > &board, int 
 
         if (isVertical == false) {
             if ((yCoord >= 0 && yCoord < row) && (xCoord >= 0) && (xCoord + length - 1 < col)) {
-                for (int i = 0; i < board.size(); i++) {
-                    for (int j = 0; j < board[0].size(); j++) {
+                for (int i = 0; i < row; i++) {
+                    for (int j = 0; j < col; j++) {
                         if (board[yCoord][xCoord] == '0') {
                             board[yCoord][xCoord] = car.carVector[0];
                         }
@@ -183,8 +184,8 @@ void Board::placeCarPiece(Car &car, std::vector<std::vector<char> > &board, int 
                     }
                 }
             } else if ((yCoord >= 0 && yCoord < row) && (xCoord >= 0) && (xCoord - (length - 1) >= 0)) {
-                for (int i = 0; i < board.size(); i++) {
-                    for (int j = 0; j < board[0].size(); j++) {
+                for (int i = 0; i < row; i++) {
+                    for (int j = 0; j < col; j++) {
                         if (board[yCoord][xCoord] == '0') {
                             board[yCoord][xCoord] = car.carVector[0];
                         }
@@ -197,8 +198,8 @@ void Board::placeCarPiece(Car &car, std::vector<std::vector<char> > &board, int 
 
         if (isVertical == true) {
             if ((xCoord >= 0 && xCoord < col) && (yCoord >= 0) && (yCoord + length - 1 < row)) {
-                for (int i = 0; i < board.size(); i++) {
-                    for (int j = 0; j < board[0].size(); j++) {
+                for (int i = 0; i < row; i++) {
+                    for (int j = 0; j < col; j++) {
                         if (board[yCoord][xCoord] == '0') {
                             board[yCoord][xCoord] = car.carVector[0];
                         }
@@ -207,8 +208,8 @@ void Board::placeCarPiece(Car &car, std::vector<std::vector<char> > &board, int 
                     }
                 }
             } else if ((xCoord >= 0 && xCoord < col) && (yCoord >= 0) && (yCoord - (length - 1) >= 0)) {
-                for (int i = 0; i < board.size(); i++) {
-                    for (int j = 0; j < board[0].size(); j++) {
+                for (int i = 0; i < row; i++) {
+                    for (int j = 0; j < col; j++) {
                         if (board[yCoord][xCoord] == '0') {
                             board[yCoord][xCoord] = car.carVector[0];
                         }
@@ -232,8 +233,8 @@ void Board::placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board
 
         if (isVertical == false) {
             if ((yCoord >= 0 && yCoord < row) && (xCoord >= 0) && (xCoord + length - 1 < col)) {
-                for (int i = 0; i < board.size(); i++) {
-                    for (int j = 0; j < board[0].size(); j++) {
+                for (int i = 0; i < row; i++) {
+                    for (int j = 0; j < col; j++) {
                         if (board[yCoord][xCoord] == '0') {
                             board[yCoord][xCoord] = truck.truckVector[0];
                         }
@@ -246,8 +247,8 @@ void Board::placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board
                     }
                 }
 
-                for (int i = 0; i < idBoard.size(); i++) {
-                    for (int j = 0; j < board[0].size(); j++) {
+                for (int i = 0; i < row; i++) {
+                    for (int j = 0; j < col; j++) {
                         if (idBoard[yCoord][xCoord] == 0) {
                             idBoard[yCoord][xCoord] = truck.truckId;
                         }
@@ -260,8 +261,8 @@ void Board::placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board
                     }
                 }
             } else if ((yCoord >= 0 && yCoord < row) && (xCoord >= 0) && (xCoord - (length - 1) >= 0)){
-                for (int i = 0; i < board.size(); i++) {
-                    for (int j = 0; j < board[0].size(); j++) {
+                for (int i = 0; i < row; i++) {
+                    for (int j = 0; j < col; j++) {
                         if (board[yCoord][xCoord] == '0') {
                             board[yCoord][xCoord] = truck.truckVector[0];
                         }
@@ -274,8 +275,8 @@ void Board::placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board
                     }
                 }
 
-                for (int i = 0; i < idBoard.size(); i++) {
-                    for (int j = 0; j < board[0].size(); j++) {
+                for (int i = 0; i < row; i++) {
+                    for (int j = 0; j < col; j++) {
                         if (idBoard[yCoord][xCoord] == 0) {
                             idBoard[yCoord][xCoord] = truck.truckId;
                         }
@@ -292,8 +293,8 @@ void Board::placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board
 
         if (isVertical == true) {
             if ((xCoord >= 0 && xCoord < col) && (yCoord >= 0) && (yCoord + length - 1 < row)) {
-                for (int i = 0; i < board.size(); i++) {
-                    for (int j = 0; j < board[0].size(); j++) {
+                for (int i = 0; i < row; i++) {
+                    for (int j = 0; j < col; j++) {
                         if (board[yCoord][xCoord] == '0') {
                             board[yCoord][xCoord] = truck.truckVector[0];
                         }
@@ -306,8 +307,8 @@ void Board::placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board
                     }
                 }
 
-                for (int i = 0; i < idBoard.size(); i++) {
-                    for (int j = 0; j < board[0].size(); j++) {
+                for (int i = 0; i < row; i++) {
+                    for (int j = 0; j < col; j++) {
                         if (idBoard[yCoord][xCoord] == 0) {
                             idBoard[yCoord][xCoord] = truck.truckId;
                         }
@@ -320,8 +321,8 @@ void Board::placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board
                     }
                 }
             } else if ((xCoord >= 0 && xCoord < col) && (yCoord >= 0) && (yCoord - (length - 1) >= 0)){
-                for (int i = 0; i < board.size(); i++) {
-                    for (int j = 0; j < board[0].size(); j++) {
+                for (int i = 0; i < row; i++) {
+                    for (int j = 0; j < col; j++) {
                         if (board[yCoord][xCoord] == '0') {
                             board[yCoord][xCoord] = truck.truckVector[0];
                         }
@@ -333,8 +334,8 @@ void Board::placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board
                         }
                     }
                 }
-                for (int i = 0; i < idBoard.size(); i++) {
-                    for (int j = 0; j < board[0].size(); j++) {
+                for (int i = 0; i < row; i++) {
+                    for (int j = 0; j < col; j++) {
                         if (idBoard[yCoord][xCoord] == 0) {
                             idBoard[yCoord][xCoord] = truck.truckId;
                         }
@@ -354,8 +355,11 @@ void Board::placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board
 std::vector<std::vector<char> > Board::initializeBoard() {
     std::vector<std::vector<char> > board(height, std::vector<char>(width, '0'));
 
-    for (int i = 0; i < board.size(); i++) {
-        for (int j = 0; j < board[0].size(); j++) {
+    int row = board.size();
+    int col = board[0].size();
+
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
             board[i][j] = '0';
         }
     }
@@ -364,8 +368,12 @@ std::vector<std::vector<char> > Board::initializeBoard() {
 
 std::vector<std::vector<int>> Board::initializeIdBoard() {
     std::vector<std::vector<int> > board(height, std::vector<int>(width, 0));
-    for (int i = 0; i < board.size(); i++) {
-        for (int j = 0; j < board[0].size();j ++) {
+
+    int row = board.size();
+    int col = board[0].size();
+
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
             board[i][j] = 0;
         }
     }
