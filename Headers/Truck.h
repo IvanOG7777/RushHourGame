@@ -9,9 +9,10 @@
 class Truck {
 public:
     int truckLength;
+    int truckId;
     std:: vector<char> truckVector;
     void printTruck();
-    Truck();
+    Truck(int passedId) : truckId(passedId) {};
 
 private:
     std:: vector<char> initializeTruck() const;

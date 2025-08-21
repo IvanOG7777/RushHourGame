@@ -13,9 +13,12 @@ class Board {
     int height;
     int width;
     std:: vector<std:: vector<char>> grid;
+    std:: vector<std::vector<int>> idGrid;
     Board(int height, int width);
 
     void printBoard();
+
+    void printIdBoard();
 
     bool isInBounds(std::vector<char> &pieceVector, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical);
 
@@ -23,7 +26,7 @@ class Board {
 
     void placeCarPiece(Car &car, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical);
 
-    void placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical);
+    void placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board, std::vector<std::vector<int>>& idBoard,int xCoord, int yCoord, bool isVertical);
 
     void movePieceDynamically(std::vector<char>& pieceVector, std::vector<std::vector<char>>& board, int &xCoord, int &yCoord, bool isVertical, int dx, int dy);
 
@@ -32,7 +35,8 @@ class Board {
     }
 
     private:
-    std::vector<std::vector<char>> initializeBoard();
+    std:: vector<std:: vector<char>> initializeBoard();
+    std::vector<std::vector<int>> initializeIdBoard();
 };
 
 #endif //BOARD_H

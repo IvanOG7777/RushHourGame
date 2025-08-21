@@ -6,7 +6,7 @@
 #include <iostream>
 
 
-Truck::Truck() : truckLength(3), truckVector(initializeTruck()){}
+Truck::Truck(int passedId) : truckId(passedId), truckLength(3), truckVector(initializeTruck()) {}
 
 void Truck:: printTruck() {
     for (char i : truckVector) {
