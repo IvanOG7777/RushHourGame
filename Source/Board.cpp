@@ -25,10 +25,9 @@ void Board::printBoard() {
 }
 
 bool Board::isInBounds(std::vector<char> &pieceVector, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical) {
-    bool inBounds = false;
 
     if (board.empty() || board[0].empty()) {
-        return inBounds;
+        return false;
     }
 
     int row = static_cast<int>(board.size());
@@ -38,41 +37,23 @@ bool Board::isInBounds(std::vector<char> &pieceVector, std::vector<std::vector<c
     if ((isVertical == false)) {
         // checks the horizontal bounds of the piece that is being placed
 
-        if ( // checks piece doing from left to right
-            (yCoord >= 0 && yCoord < row) &&
-            (xCoord >= 0) &&
-            (xCoord + length - 1 < col)
-        ) {
-            inBounds = true;
+        if (yCoord < 0 || yCoord >= row) {
+            return false;
         }
-
-        if ( // checks piece doing from right to left
-            (yCoord >= 0 && yCoord < row) &&
-            (xCoord >= 0) &&
-            (xCoord - (length - 1) >= 0)
-        ) {
-            inBounds = true;
+        if (xCoord < 0 || xCoord + length - 1 >= col) {
+            return false;
         }
     } else if (isVertical == true) {
         // checks the vertical bounds of the piece that is being placed
-
-        if ( // checks vertical going from up to down
-            (xCoord >= 0 && xCoord < col) &&
-            (yCoord >= 0) &&
-            (yCoord + length - 1 < row)
-        ) {
-            inBounds = true;
+        if (xCoord < 0 || xCoord >= col) {
+            return false;
         }
 
-        if ( // checks vertical going from down to up
-            (xCoord >= 0 && xCoord < col) &&
-            (yCoord >= 0) &&
-            (yCoord - (length - 1) >= 0)
-        ) {
-            inBounds = true;
+        if (yCoord < 0 || yCoord + length - 1 >= col) {
+            return false;
         }
     }
-    return inBounds;
+    return true;
 }
 
 bool Board::collides(std::vector<char> &pieceVector, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical) {
@@ -81,66 +62,20 @@ bool Board::collides(std::vector<char> &pieceVector, std::vector<std::vector<cha
             return true;
         }
 
-        const int rows = static_cast<int>(board.size());
-        const int cols = static_cast<int>(board[0].size());
-        const int len  = static_cast<int>(pieceVector.size());
+        int length = static_cast<int>(pieceVector.size());
 
         if (isVertical == false) {
-            if (xCoord + len - 1 < cols) {
-                collision = false;
-                for (int k = 0; k < len; k++) {
-                    if (board[yCoord][xCoord + k] != '0') {
-                        collision = true;
-                        break;
-                    }
-                }
-                if (collision == false) {
-                    return collision;
-                }
-            }
-
-            if (xCoord - (len - 1) >= 0 ) {
-                collision = false;
-                for (int k = 0; k < len; k++) {
-                    if (board[yCoord][xCoord - k] != '0') {
-                        collision = true;
-                        break;
-                    }
-                }
-                if (collision == false) {
-                    return collision;
-                }
+            for (int k = 0; k < length; k++) {
+                if (board[yCoord][xCoord + k] != '0') return true;
             }
         }
 
         if (isVertical == true) {
-            if (yCoord + len - 1 < rows) {
-                collision = false;
-                for (int k = 0; k < len; k++) {
-                    if (board[yCoord + k][xCoord] != '0') {
-                        collision = true;
-                        break;
-                    }
-                }
-                if (collision == false) {
-                    return collision;
-                }
-            }
-
-            if (yCoord - (len - 1) >= 0 ) {
-                collision = false;
-                for (int k = 0; k < len; k++) {
-                    if (board[yCoord - k][xCoord] != '0') {
-                        collision = true;
-                        break;
-                    }
-                }
-                if (collision == false) {
-                    return collision;
-                }
+            for (int k = 0; k < length; k++) {
+                if (board[yCoord + k][xCoord] != '0') return true;
             }
         }
-        return collision;
+        return false;
 }
 
 void Board::movePieceDynamically(std::vector<char>& pieceVector, std::vector<std::vector<char>>& board, int &xCoord, int &yCoord, bool isVertical, int dx, int dy) {
@@ -197,6 +132,22 @@ void Board::movePieceDynamically(std::vector<char>& pieceVector, std::vector<std
         }
         std::cout << std::endl;
     }
+}
+
+void Board::grabPiece(std::vector<std::vector<char>>& board, int xCoord, int yCoord) {
+    int row = board.size();
+    int col = board[0].size();
+    bool canSelect = false;
+    char selectedCharacter;
+
+    if (board[yCoord][xCoord] == '0') canSelect = false;
+
+    if (board[yCoord][xCoord] != '0') {
+        canSelect = true;
+        selectedCharacter = board[yCoord][xCoord];
+    }
+
+
 }
 
 void Board::placeCarPiece(Car &car, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical) {

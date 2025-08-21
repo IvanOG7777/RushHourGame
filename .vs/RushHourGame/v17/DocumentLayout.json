@@ -1,13 +1,13 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\sexyz\\Desktop\\C\u002BProjects\\RushHourGame\\",
+  "WorkspaceRootPath": "C:\\Users\\elder\\OneDrive\\Desktop\\C\u002B\u002BProjects\\RushHourGame\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\sexyz\\Desktop\\C\u002BProjects\\RushHourGame\\Source\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\elder\\OneDrive\\Desktop\\C\u002B\u002BProjects\\RushHourGame\\Source\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Source\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\sexyz\\Desktop\\C\u002BProjects\\RushHourGame\\CppProperties.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\elder\\OneDrive\\Desktop\\C\u002B\u002BProjects\\RushHourGame\\CppProperties.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:CppProperties.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     }
   ],
@@ -28,9 +28,9 @@
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "CppProperties.json",
-              "DocumentMoniker": "C:\\Users\\sexyz\\Desktop\\C\u002BProjects\\RushHourGame\\CppProperties.json",
+              "DocumentMoniker": "C:\\Users\\elder\\OneDrive\\Desktop\\C\u002B\u002BProjects\\RushHourGame\\CppProperties.json",
               "RelativeDocumentMoniker": "CppProperties.json",
-              "ToolTip": "C:\\Users\\sexyz\\Desktop\\C\u002BProjects\\RushHourGame\\CppProperties.json",
+              "ToolTip": "C:\\Users\\elder\\OneDrive\\Desktop\\C\u002B\u002BProjects\\RushHourGame\\CppProperties.json",
               "RelativeToolTip": "CppProperties.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
@@ -40,11 +40,11 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "main.cpp",
-              "DocumentMoniker": "C:\\Users\\sexyz\\Desktop\\C\u002BProjects\\RushHourGame\\Source\\main.cpp",
+              "DocumentMoniker": "C:\\Users\\elder\\OneDrive\\Desktop\\C\u002B\u002BProjects\\RushHourGame\\Source\\main.cpp",
               "RelativeDocumentMoniker": "Source\\main.cpp",
-              "ToolTip": "C:\\Users\\sexyz\\Desktop\\C\u002BProjects\\RushHourGame\\Source\\main.cpp",
+              "ToolTip": "C:\\Users\\elder\\OneDrive\\Desktop\\C\u002B\u002BProjects\\RushHourGame\\Source\\main.cpp",
               "RelativeToolTip": "Source\\main.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB4AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-08-19T23:49:08.183Z",
               "EditorCaption": ""

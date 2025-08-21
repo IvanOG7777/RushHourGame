@@ -15,12 +15,14 @@ int main() {
     bool running = true;
     bool hasPlacedPiece = false;
     Car car;
-    bool isVertical = true;      // test vertical-only movement
-    int x = 2, y = 1;
+    bool isVertical = false;      // test vertical-only movement
+    int x = 0, y = 1;
     Truck truck;
     Board board(BOARD_HEIGHT, BOARD_WIDTH);
-
-    board.placeTruckPiece(truck, board.grid, 2, 3, false);
+    
+    board.placeTruckPiece(truck, board.grid, 3, 1, false);
+    board.placeCarPiece(car, board.grid, 2, 4, true);
+    
 
 
         while (running && !hasPlacedPiece) {
