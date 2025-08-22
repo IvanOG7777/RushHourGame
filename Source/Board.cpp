@@ -160,7 +160,7 @@ void Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int yCoo
 
     if (yCoord < 0 || yCoord >= row || xCoord < 0 || xCoord >= yCoord) return; //out of bounds check 
 
-    if (board[yCoord][xCoord] != 0) {
+    if (board[yCoord][xCoord] != 0) { // checks if cell isnt a 0 and grabs what ever id number is at that cell
         selected = board[yCoord][xCoord];
         indexPair.first = xCoord;
         indexPair.second =yCoord;
@@ -219,6 +219,9 @@ void Board::placeCarPiece(Car &car, std::vector<std::vector<char> > &board, int 
                         if (board[yCoord - 1][xCoord] == '0')
                             board[yCoord - 1][xCoord] = car.carVector[1];
             }
+        }
+        else {
+            return;
         }
 }
 
@@ -279,6 +282,9 @@ void Board::placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board
                         }
                    
             }
+            else {
+                return;
+            }
         }
 
         if (isVertical == true) {
@@ -306,7 +312,7 @@ void Board::placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board
                             idBoard[yCoord + 2][xCoord] = truck.truckId;
                         }
                    
-            } else if ((xCoord >= 0 && xCoord < col) && (yCoord >= 0) && (yCoord - (length - 1) >= 0)){
+            } else if ((xCoord >= 0 && xCoord < col) && (yCoord >= 0) && (yCoord - (length - 1) >= 0)) {
                 
                         if (board[yCoord][xCoord] == '0') {
                             board[yCoord][xCoord] = truck.truckVector[0];
@@ -328,6 +334,9 @@ void Board::placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board
                         if (idBoard[yCoord - 1][xCoord] == 0) {
                             idBoard[yCoord - 1][xCoord] = truck.truckId;
                         }
+            }
+            else {
+                return;
             }
         }
 }
