@@ -20,27 +20,10 @@ int main() {
     Truck truck(1);
     Board board(BOARD_HEIGHT, BOARD_WIDTH);
 
-    std::cout << "Before placing piece" << std::endl;
-
-    std::cout << "Charater Board" << std::endl;
-    board.printBoard();
-
-    std::cout << std::endl;
-
-    std::cout << "ID Board" << std::endl;
-    board.printIdBoard();
-    
     board.placeTruckPiece(truck, board.grid, board.idGrid, 3, 1, false);
     board.placeTruckPiece(truck, board.grid, board.idGrid, 0, 0, true);
 
-    std::cout << std::endl;
-
-    std::cout << "After placing piece" << std::endl;
-
-    std::cout << "Charater Board" << std::endl;
-    board.printBoard();
-
-    std::cout << std::endl;
+    board.grabPiece(board.idGrid, 3, 1);
 
     std::cout << "ID Board" << std::endl;
     board.printIdBoard();

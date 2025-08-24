@@ -150,26 +150,43 @@ void Board::movePieceDynamically(std::vector<char>& pieceVector, std::vector<std
 void Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int yCoord) {
     int row = board.size();
     int col = board[0].size();
-    int selected = 0;
 
-    bool searching = true;
-    std::vector <std:: pair<int, int>> vistedVector;
-    std::pair<int, int> indexPair;
+    if (yCoord < 0 || yCoord >= row || xCoord < 0 || xCoord >= col) return; //out of bounds check 
+
+    int target = idGrid[yCoord][xCoord];
+    if (target == 0) return;
+    
+    std::vector <std:: vector<bool>> visited(row, std:: vector<bool>(col, false));
+    std:: vector <std::pair<int, int>> indexPair;
     std::queue<std::pair<int, int>> queue;
     
+    queue.push({xCoord, yCoord});
+    visited[yCoord][xCoord] = true;
 
-    if (yCoord < 0 || yCoord >= row || xCoord < 0 || xCoord >= yCoord) return; //out of bounds check 
 
-    if (board[yCoord][xCoord] != 0) { // checks if cell isnt a 0 and grabs what ever id number is at that cell
-        selected = board[yCoord][xCoord];
-        indexPair.first = xCoord;
-        indexPair.second =yCoord;
-        vistedVector.push_back(indexPair);
+    while (!queue.empty()) {
+        std::pair<int, int> cxcy = queue.front();
+        queue.pop();
+        indexPair.push_back(cxcy);
+
+        const int dx[4] = { -1, 1, 0, 0 };
+        const int dy[4] = { 0, 0, -1, 1 };
+
+        for (int i = 0; i < 4; i++) {
+            int nx = cxcy.first + dx[i];
+            int ny = cxcy.second + dy[i];
+
+            if (nx < 0 || nx >= col || ny < 0 || ny >= row) continue;
+            if (visited[ny][nx]) continue;
+            if (board[ny][nx] != target) continue;
+            visited[ny][nx] = true;
+            queue.push({ nx, ny });
+        }
     }
 
-
-
-
+    for (auto pair : indexPair) {
+        std::cout << "{" << pair.first << "," << pair.second << "}" << std::endl;
+    }
 }
 
 void Board::placeCarPiece(Car &car, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical) {
