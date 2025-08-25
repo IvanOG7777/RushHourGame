@@ -23,7 +23,7 @@ int main() {
     board.placeTruckPiece(truck, board.grid, board.idGrid, 3, 1, false);
     board.placeTruckPiece(truck, board.grid, board.idGrid, 0, 0, true);
 
-    board.grabPiece(board.idGrid, 3,1);
+    board.grabPiece(board.idGrid, 0,2);
 
     std::cout << "ID Board" << std::endl;
     board.printIdBoard();

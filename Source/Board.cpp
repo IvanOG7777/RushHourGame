@@ -189,6 +189,9 @@ void Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int yCoo
         }
     }
 
+    if (indexPairs.empty()) {
+        return;
+    }
     std::pair <int, int> firstPair = indexPairs.front();
     std::cout << firstPair.first << firstPair.second << std::endl;
 
@@ -213,10 +216,19 @@ void Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int yCoo
         if (indexPairs[i].second < minY) {
             minY = indexPairs[i].second;
         }
+
+        std::cout << "Loop:" << i << std::endl;
+        std::cout << "Max X: " << maxX << std::endl;
+        std::cout << "Max Y: " <<  maxY << std::endl;
+        std::cout << "Min X: " << minX << std::endl;
+        std::cout << "Min Y: " << minY << std::endl;
+        std::cout << std::endl;
     }
 
     anchorX = minX;
     anchorY = minY;
+
+    std::cout << "Anchor Point" << "{" << minX << "," << minY << "}" << std::endl;
 }
 
 void Board::placeCarPiece(Car &car, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical) {
