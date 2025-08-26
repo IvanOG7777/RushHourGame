@@ -30,7 +30,7 @@ class Board {
 
     void movePieceDynamically(std::vector<char>& pieceVector, std::vector<std::vector<char>>& board, int &xCoord, int &yCoord, bool isVertical, int dx, int dy);
 
-    void grabPiece(std::vector<std::vector<int>>& board, int xCoord, int yCoord);
+    std:: vector<std::pair<int,int>> grabPiece(std::vector<std::vector<int>>& board, int xCoord, int yCoord);
 
     private:
     std:: vector<std:: vector<char>> initializeBoard();

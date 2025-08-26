@@ -148,16 +148,16 @@ void Board::movePieceDynamically(std::vector<char>& pieceVector, std::vector<std
     }
 }
 
-void Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int yCoord) {
+std:: vector<std:: pair<int,int>> Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int yCoord) {
     int row = board.size();
     int col = board[0].size();
 
-    if (yCoord < 0 || yCoord >= row || xCoord < 0 || xCoord >= col) return; //out of bounds check 
+    if (yCoord < 0 || yCoord >= row || xCoord < 0 || xCoord >= col) return {}; //out of bounds check 
 
     int target = board[yCoord][xCoord]; // target id is the x y coord user selected
     if (target == 0) {
         std::cerr << "Selected invalid placement" << std::endl;
-        return;
+        return {};
     } // if the spot they selected is 0 (not a valid piece) return
     
     std::vector <std:: vector<bool>> visited(row, std:: vector<bool>(col, false)); // create a bool map of size height x width so we can check if we've seaerched that index
@@ -192,11 +192,11 @@ void Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int yCoo
         }
     }
 
-    if (indexPairs.empty()) {
+    if (indexPairs.empty()) { // sanity check for if the vector is empty
         std::cerr << "index pair vector is empty returing" << std::endl;
-        return;
+        return {};
     }
-    std::pair <int, int> firstPair = indexPairs.front();
+    std::pair <int, int> firstPair = indexPairs.front(); // sets the first pair to whatever pair was at the fornt of the vector
 
     int initialX = firstPair.first;
     int initialY = firstPair.second;
@@ -208,7 +208,7 @@ void Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int yCoo
     int minY = firstPair.second;
     int maxY = firstPair.second;
 
-    for (int i = 1; i < static_cast<int>(indexPairs.size()); i++) {
+    for (int i = 1; i < static_cast<int>(indexPairs.size()); i++) { // for loop to find the max and min x and y values
         if (indexPairs[i].first > maxX) {
             maxX = indexPairs[i].first;
         }
@@ -226,33 +226,47 @@ void Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int yCoo
         }
     }
 
-    for (int i = 0; i < static_cast<int>(indexPairs.size()); i++) {
-        if (initialX == indexPairs[i].first) {
+    for (int i = 0; i < static_cast<int>(indexPairs.size()); i++) { // for loop to count if x or y values are equal to the size of pairs in vecotr of pair (indexPairs)
+        if (initialX == indexPairs[i].first) { // if we find an x that matches the initial xValue, xcounter++
             xCounter++;
         }
 
-        if (initialY == indexPairs[i].second) {
+        if (initialY == indexPairs[i].second) {  // if we find an y that matches the initial xValue, ycounter++
             yCounter++;
         }
     }
 
-    int lengthY = (maxY - minY + 1);
-    int lengthX = (maxX - minX + 1);
-
-    if (xCounter == static_cast<int> (indexPairs.size()) && (maxY - minY + 1) == static_cast<int>(indexPairs.size())) {
-        isVertical = true;
+    if (xCounter == static_cast<int> (indexPairs.size()) && (maxY - minY + 1) == static_cast<int>(indexPairs.size())) { // checks if the current sum of xCounter and the length between cols is the same as the amount of pairs in index pairs
+        isVertical = true; // if the above is true the piece is vertical
     }
 
-    if (yCounter == static_cast<int> (indexPairs.size()) * (maxX - minX + 1) == static_cast<int> (indexPairs.size())) {
-        isVertical = false;
+    if (yCounter == static_cast<int> (indexPairs.size()) && (maxX - minX + 1) == static_cast<int> (indexPairs.size())) { // checks if the current sum of yCounter and the length between rows is the same as the amount of pairs in index pairs
+        isVertical = false; // if the above is true the piece is horizontal
+    }
+
+    if (isVertical == true) {
+        for (int i = 0; i < static_cast<int>(indexPairs.size()) - 1; i++) {
+            for (int j = 0; j < static_cast<int>(indexPairs.size()) - i - 1; j++) {
+                if (indexPairs[j].second > indexPairs[j + 1].second)
+                std::swap(indexPairs[j], indexPairs[j + 1]);
+            }
+        }
+    }
+
+    if (isVertical == false) {
+        for (int i = 0; i < static_cast<int>(indexPairs.size()) - 1; i++) {
+            for (int j = 0; j < static_cast<int>(indexPairs.size()) - i - 1; j++) {
+                if (indexPairs[j].first > indexPairs[j + 1].first)
+                    std::swap(indexPairs[j], indexPairs[j + 1]);
+            }
+        }
     }
 
     anchorX = minX;
     anchorY = minY;
 
-    std::cout << "Anchor Point" << "{" << minX << "," << minY << "}" << std::endl;
-    std::cout << "Is piece vertical: " << (isVertical ? "True" : "False") << std::endl;
 
+    return indexPairs;
 }
 
 void Board::placeCarPiece(Car &car, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical) {

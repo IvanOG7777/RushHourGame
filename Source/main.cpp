@@ -23,7 +23,14 @@ int main() {
     board.placeTruckPiece(truck, board.grid, board.idGrid, 3, 1, false);
     board.placeTruckPiece(truck, board.grid, board.idGrid, 0, 0, true);
 
-    board.grabPiece(board.idGrid, 0,0);
+    std::vector<std::pair<int, int>> vectorPairs;
+    vectorPairs = board.grabPiece(board.idGrid, 4,1);
+
+    for (auto& pair : vectorPairs) {
+        std::cout << "{" << pair.first << "," << pair.second << "}" << std::endl;
+    }
+
+    std::cout << std::endl;
 
     std::cout << "ID Board" << std::endl;
     board.printIdBoard();
