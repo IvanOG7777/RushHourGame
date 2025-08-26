@@ -8,6 +8,22 @@
 #include "../Headers/Truck.h"
 #include <vector>
 
+struct HeldPiece {
+    bool validSelection = false;
+    int pieceId = 0;
+    char glyph = '0';
+    bool isVertical = false;
+
+    int originalAnchorX = 0;
+    int originalAnchorY = 0;
+
+    std::vector<std::pair<int, int>> originalCells;
+
+    int currentX = 0;
+    int currentY = 0;
+    std::vector<std::pair<int, int>> cells;
+};
+
 class Board {
     public:
     int height;
@@ -15,6 +31,8 @@ class Board {
     std:: vector<std:: vector<char>> grid;
     std:: vector<std::vector<int>> idGrid;
     Board(int height, int width);
+
+    HeldPiece held;
 
     void printBoard();
 
@@ -31,6 +49,17 @@ class Board {
     void movePieceDynamically(std::vector<char>& pieceVector, std::vector<std::vector<char>>& board, int &xCoord, int &yCoord, bool isVertical, int dx, int dy);
 
     std:: vector<std::pair<int,int>> grabPiece(std::vector<std::vector<int>>& board, int xCoord, int yCoord);
+
+    bool beginHold(int cursorX, int cursorY);
+
+    void updateHoldMove(int dx, int dy);
+
+    bool canPlaceHeldAt(int anchorX, int anchorY) const;
+
+    void commitHold();
+
+    void cancelHold();
+
 
     private:
     std:: vector<std:: vector<char>> initializeBoard();

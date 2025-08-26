@@ -465,3 +465,112 @@ std::vector<std::vector<int>> Board::initializeIdBoard() {
     }
     return board;
 }
+
+bool Board::beginHold(int cursorX, int cursorY) { // passes in the current cell at x y value
+    auto absCells = grabPiece(idGrid, cursorX, cursorY); // gets the absolute cells from the retunr in grabPiece ex: {(1,1), (1,2), (1,3)}
+
+    if (absCells.empty()) return false; // if we happen to return empty vector to absCells and absCells is empty we break out of the fuction
+
+    //sets min and max X to first pair.first
+    int minX = absCells[0].first;
+    int maxX = minX;
+
+    //sets min and max Y to first pair.second
+    int minY = absCells[0].second;
+    int maxY = minY;
+
+    // for each loop to find actual min and max X/Y values in all pairs
+    for (auto& pair : absCells) {
+        minX = std::min(minX, pair.first);
+        maxX = std::max(maxX, pair.first);
+
+        minY = std::min(minY, pair.second);
+        maxY = std::max(maxY, pair.second);
+    }
+
+    // if the maxX if equal to minX we have a vertical piece
+    bool isVertical = (maxX == minX);
+
+    held = {}; // resets previous held struct from previous grab
+    held.validSelection = true;
+    held.pieceId = idGrid[cursorY][cursorX];
+    held.glyph = grid[cursorY][cursorX];
+    held.isVertical = isVertical;
+    held.originalAnchorX = minX;
+    held.originalAnchorY = minY;
+    held.currentX = minX;
+    held.currentY = minY;
+    held.originalCells = absCells;
+
+    //Normalzes the footprint relative to our anchor x and y points   
+    for (auto& pair : absCells) {
+        held.cells.push_back({ pair.first - minX, pair.second - minY });
+    }
+
+    // replaces the current space was taking to 0 and '0'
+    // we essentially 'lift' the piece form the board so when we move it its not colliding with its self
+    for (auto& pair : absCells) {
+        grid[pair.second][pair.first] = '0';
+        idGrid[pair.second][pair.first] = 0;
+    }
+
+    return true;
+}
+
+void Board::updateHoldMove(int dx, int dy) { // pass in the movement of the arrow inputs
+    if (!held.validSelection) return; // if held.validSelection is false we return from the function
+
+    int nextX = held.currentX + dx; // nextX is equal to our currentX plus the x direction movement
+    int nextY = held.currentY + dy; // nextY is equal to our currentX plus the y direction movement
+
+    if (canPlaceHeldAt(nextX, nextY)) { // calls canPlaceHeldAt at the new x and y values to check if piece can be placed
+        held.currentX = nextX; // replaces the current x with nextX;
+        held.currentY = nextY; // replaces the current y with nextX;
+    }
+}
+
+bool Board::canPlaceHeldAt(int anchorX, int anchorY) const {
+    if (!held.validSelection) return false;
+
+    int rows = grid.size();
+    int cols = grid[0].size();
+
+    for (auto& pair : held.cells) {
+        int x = anchorX + pair.first;
+        int y = anchorY + pair.second;
+
+        if (y < 0 || y >= rows || x < 0 || x >= cols) {
+            return false;
+        }
+
+        if (idGrid[y][x] != 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void Board::commitHold() {
+    if (!held.validSelection) return;
+
+    // for each loop grabs the 
+    for (auto& pair : held.cells) {
+        int x = held.currentX + pair.first;
+        int y = held.currentY + pair.second;
+
+        grid[y][x] = held.glyph;
+        idGrid[y][x] = held.pieceId;
+
+    }
+    held = {};
+}
+
+void Board::cancelHold() {
+    if (!held.validSelection) return;
+
+    for (auto& pair : held.originalCells) {
+        grid[pair.second][pair.first] = held.glyph;
+        idGrid[pair.second][pair.first] = held.pieceId;
+    }
+    held = {};
+}
