@@ -148,7 +148,7 @@ void Board::movePieceDynamically(std::vector<char>& pieceVector, std::vector<std
     }
 }
 
-std:: vector<std:: pair<int,int>> Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int yCoord) {
+HeldPiece Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int yCoord) {
     int row = board.size();
     int col = board[0].size();
 
@@ -266,7 +266,7 @@ std:: vector<std:: pair<int,int>> Board::grabPiece(std::vector<std::vector<int>>
     anchorY = minY;
 
 
-    return indexPairs;
+    return held
 }
 
 void Board::placeCarPiece(Car &car, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical) {
@@ -529,8 +529,9 @@ void Board::updateHoldMove(int dx, int dy) { // pass in the movement of the arro
     }
 }
 
-bool Board::canPlaceHeldAt(int anchorX, int anchorY) const {
-    if (!held.validSelection) return false;
+//function to check if we can place a piece at current x/y coord
+bool Board::canPlaceHeldAt(int anchorX, int anchorY) const { // passes in x and y coord that we want to place at
+    if (!held.validSelection) return false; // checks if we have a vliad selection of piece if not we return
 
     int rows = grid.size();
     int cols = grid[0].size();

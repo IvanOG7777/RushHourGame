@@ -18,72 +18,89 @@ int main() {
     bool isVertical = false;      // test vertical-only movement
     int x = 0, y = 1;
     Truck truck(1);
+    Truck truck2(2); 
     Board board(BOARD_HEIGHT, BOARD_WIDTH);
 
     board.placeTruckPiece(truck, board.grid, board.idGrid, 3, 1, false);
-    board.placeTruckPiece(truck, board.grid, board.idGrid, 0, 0, true);
+    board.placeTruckPiece(truck2, board.grid, board.idGrid, 0, 0, true);
 
     std::vector<std::pair<int, int>> vectorPairs;
-    vectorPairs = board.grabPiece(board.idGrid, 4,1);
+    vectorPairs = board.grabPiece(board.idGrid, 4, 1);
 
-    for (auto& pair : vectorPairs) {
-        std::cout << "{" << pair.first << "," << pair.second << "}" << std::endl;
+    int cursorX = 0;
+    int cursorY = 0;
+    bool isHolding = false;
+
+    auto redraw = [&]() {
+        system("cls");
+        std::cout << "Use arrow keys to move cursor. Enter=Grab/PLace, Esc =Cancel" << std::endl;
+        std::cout << "Cursor at (" << cursorX << "," << cursorY << ") | " << (isHolding ? "[Holding]" : "[Idle]") << std::endl;
+        std::cout << std::endl;
+
+        board.printBoard();
+        std::cout << "Id board" << std::endl;
+        board.printIdBoard();
+    };
+
+    redraw();
+
+    while (running) {
+        int ch = _getch();
+
+        if (ch == 27) {
+            if (isHolding) {
+                board.cancelHold();
+                isHolding = false;
+                redraw();
+            }
+            else {
+                running = false;
+            }
+            continue;
+        }
+
+        if (ch == 224) {
+            int arrow = _getch();
+
+            if (!isHolding) {
+                if (arrow == 72 && cursorY > 0) cursorY--;
+                if (arrow == 80 && cursorY < BOARD_HEIGHT) cursorY++;
+                if (arrow == 75 && cursorX > 0) cursorX--;
+                if (arrow == 77 && cursorX < BOARD_WIDTH) cursorX++;
+            }
+            else {
+                int dx = 0;
+                int dy = 0;
+                if (arrow == 72) dy = -1;
+                if (arrow == 80) dy = +1;
+                if (arrow == 75) dx = -1;
+                if (arrow == 77) dx = +1;
+
+                board.updateHoldMove(dx, dy);
+            }
+            redraw();
+            continue;
+        }
+
+        if (ch == 13) {
+            if (!isHolding) {
+                if (board.beginHold(cursorX, cursorY)) {
+                    isHolding = true;
+                }
+                else {
+                    std::cout << "No piece at (" << cursorX << "," << cursorY << ") to grab" << std::endl;
+                    Sleep(500);
+                }
+            }
+            else {
+                board.commitHold();
+                isHolding = false;
+            }
+            redraw();
+            continue;
+        }
     }
 
-    std::cout << std::endl;
+    return 0;
 
-    std::cout << "ID Board" << std::endl;
-    board.printIdBoard();
-
-
-
-
-//        while (running && !hasPlacedPiece) {
-//            board.movePieceDynamically(car.carVector, board.grid, x, y, isVertical, 0, 0);
-//
-//            int dx = 0;
-//            int dy = 0;
-//
-//
-//            int ch = _getch();
-//
-//            if (ch == 27) { // ESC
-//                running = false;
-//                break;
-//            }
-//
-//            if (ch == 224) {
-//                int arrow = _getch();
-//                if (isVertical) {
-//                    if (arrow == 72) dy -= 1;
-//                    if (arrow == 80) dy += 1;
-//                }
-//                else {
-//                    if (arrow == 75) dx -= 1;
-//                    if (arrow == 77) dx += 1;
-//                }
-//            }
-//
-//            if (ch == 13) {
-//                if (!board.collides(car.carVector, board.grid, x, y, isVertical)) {
-//                    const int length = static_cast<int>(car.carVector.size());
-//                    if (isVertical) {
-//                        for (int k = 0; k < length; k++) {
-//                            board.grid[y + k][x] = car.carVector[k];
-//                      }
-//                    }
-//                   else {
-//                        for (int k = 0; k < length; k++) {
-//                            board.grid[y][x + k] = car.carVector[k];
-//                        }
-//                    }
-//                    hasPlacedPiece = true;
-//                    board.printBoard();
-//                }
-//                continue; 
-//            }
-//            if (dx != 0 || dy != 0) {
-//                board.movePieceDynamically(car.carVector, board.grid, x, y, isVertical, dx, dy);
-//            }
-//    }
-//}
+}
