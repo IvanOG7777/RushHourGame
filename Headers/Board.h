@@ -98,16 +98,6 @@ class Board {
             int cursorY
         );
         
-        void updateHoldMove(
-            int dx, 
-            int dy
-        );
-        
-        bool canPlaceHeldAt(
-            int anchorX, 
-            int anchorY
-        ) const;
-        
         void commitHold();
         
         void cancelHold();

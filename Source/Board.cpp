@@ -9,11 +9,15 @@
 #include <queue>
 #include  <map>
 
-Board::Board(int passedHeight, int passedWidth) : height(passedHeight), width(passedWidth) { 
+Board::Board(int passedHeight, int passedWidth) : height(passedHeight), width(passedWidth) { // passes the height nad width of map
+    //initializes the char grid and id grid
     grid = initializeBoard();
     idGrid = initializeIdBoard();
 }
 
+
+//function used to print board
+//TODO, each piece has a specific id so if element comes across that unique id print only its color, no sharing colors
 void Board::printBoard() {
     for (auto &row: grid) {
         for (auto element: row) {
@@ -29,6 +33,8 @@ void Board::printBoard() {
     }
 }
 
+//prints the id to the board
+// todo same as printBoard();
 void Board::printIdBoard() {
     for (auto &row : idGrid) {
         for (auto element : row) {
@@ -38,18 +44,19 @@ void Board::printIdBoard() {
     }
 }
 
-bool Board::isInBounds(std::vector<char> &pieceVector, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical) {
+//function to check if piece is in bounds of the map
+bool Board::isInBounds(std::vector<char> &pieceVector, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical) { // pass in the pieceVector, char board, x/t coord and if the piece is vertical or not
 
-    if (board.empty() || board[0].empty()) {
+    if (board.empty() || board[0].empty()) { // check if board is empty if it is return out of function
         return false;
     }
 
+    //initializes rows/cols/and length to use below
     int row = static_cast<int>(board.size());
     int col = static_cast<int>(board[0].size());
     int length = static_cast<int>(pieceVector.size());
 
-    if ((isVertical == false)) {
-        // checks the horizontal bounds of the piece that is being placed
+    if ((isVertical == false)) { // checks the horizontal bounds of the piece that is being placed
 
         if (yCoord < 0 || yCoord >= row) {
             return false;
@@ -57,8 +64,7 @@ bool Board::isInBounds(std::vector<char> &pieceVector, std::vector<std::vector<c
         if (xCoord < 0 || xCoord + length - 1 >= col) {
             return false;
         }
-    } else if (isVertical == true) {
-        // checks the vertical bounds of the piece that is being placed
+    } else if (isVertical == true) { // checks the vertical bounds of the piece that is being placed
         if (xCoord < 0 || xCoord >= col) {
             return false;
         }
@@ -70,15 +76,23 @@ bool Board::isInBounds(std::vector<char> &pieceVector, std::vector<std::vector<c
     return true;
 }
 
-bool Board::collides(std::vector<char> &pieceVector, std::vector<std::vector<char> > &board, std::vector<std::vector <int>>& idBoard, int xCoord, int yCoord, bool isVertical) {
-     bool collision = false;
-        if (isInBounds(pieceVector, board, xCoord, yCoord, isVertical) == false) {
+//function for collsion detector for pieces on the map
+bool Board::collides(std::vector<char> &pieceVector, std::vector<std::vector<char> > &board, std::vector<std::vector <int>>& idBoard, int xCoord, int yCoord, bool isVertical) { //passes in the char pieceVector, char board, int idBoard, x/y coord and if piece is vertical
+     
+    bool collision = false; // assume there is no collision
+
+        if (isInBounds(pieceVector, board, xCoord, yCoord, isVertical) == false) { // call isInBounds to check if our current parameters passed are even in the map, if in bounds returns false (not in map)
+            // we have a 'collison' break out of this function
             return true;
         }
 
+        //initlaizes length
         int length = static_cast<int>(pieceVector.size());
 
+        // if piece is horizontal
         if (isVertical == false) {
+            //loop through the length of piece
+            //and if piece hits a c or k char we hit a piece
             for (int k = 0; k < length; k++) {
                 if (board[yCoord][xCoord + k] != '0') return true;
             }
@@ -87,8 +101,10 @@ bool Board::collides(std::vector<char> &pieceVector, std::vector<std::vector<cha
                 if (idBoard[yCoord][xCoord + k] != 0) return true;
             }
         }
-
+        // if piece is vetical
         if (isVertical == true) {
+            //loop through the length of piece
+            //and if piece hits a c or k char we hit a piece
             for (int k = 0; k < length; k++) {
                 if (board[yCoord + k][xCoord] != '0') return true;
             }
@@ -97,37 +113,54 @@ bool Board::collides(std::vector<char> &pieceVector, std::vector<std::vector<cha
                 if (idBoard[yCoord + k][xCoord] != 0) return true;
             }
         }
+
+        // if we pass the above we have NOT hit another piece
+        // return false
         return false;
 }
 
+
+//function to move a selected piece
+// pass in the char pieceVector, char board, int idBoard, initial x/y coord and our moving x/y coords (dx/dy)
 void Board::movePieceDynamically(std::vector<char>& pieceVector, std:: vector<int> &pieceIdVector, std::vector<std::vector<char>>& board, std::vector<std::vector <int>>& idBoard, int &xCoord, int &yCoord, bool isVertical, int dx, int dy) {
+    //create temps board to use within function
     auto &tempBoard = board;
     auto& tempIdBoard = idBoard;
+
+    //initlaize bounds and length
     int rows = board.size();
     int cols = board[0].size();
     int length = pieceVector.size();
 
+    //newly calucalted x/y values useing out anchor x/y coord and dx/dy
     int newX = xCoord + dx;
     int newY = yCoord + dy;
 
 
-
+    // if the piece is vertical
     if (isVertical == true) {
+        //bounds checker
         if (newY < 0 || (newY + length - 1) >= rows) return;
         if (newX < 0 || newX >= cols) return;
     }
 
+    // if the piece is vertical
     if (isVertical == false) {
+        //bounds checker
         if (newX < 0 || (newX + length - 1) >= cols) return;
         if (newY < 0 || newY >= rows) return;
     }
 
-    if (collides(pieceVector, board, idBoard, newX, newY, isVertical) == true) return;
+    if (collides(pieceVector, board, idBoard, newX, newY, isVertical) == true) return; // call the collision dectector to see if weve hit a piece
+    // if we pass
 
+    //out new anchor coords are newX/newY
     xCoord = newX;
     yCoord = newY;
 
+    // if piece is vertical
     if (isVertical == true) {
+        // place piece vertically using new anchor points in char and int board
         for (int k = 0; k < length; k++) {
             tempBoard[yCoord + k][xCoord] = pieceVector[k];
         }
@@ -137,7 +170,9 @@ void Board::movePieceDynamically(std::vector<char>& pieceVector, std:: vector<in
         }
     }
 
+    // if piece is horizontal
     if (isVertical == false) {
+        // place piece horizontally using new anchor points in char and int board
         for (int k = 0; k < length; k++) {
             tempBoard[yCoord][xCoord + k] = pieceVector[k];
         }
@@ -148,10 +183,12 @@ void Board::movePieceDynamically(std::vector<char>& pieceVector, std:: vector<in
     }
 }
 
-HeldPiece Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int yCoord) {
+// function to grab a selected piece on the map
+HeldPiece Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int yCoord) { // passes in the int board and x/y coords
+    //inializes the row and cols
     int row = board.size();
     int col = board[0].size();
-    HeldPiece result;
+    HeldPiece result; // create new HeldPiece object called result
 
     if (yCoord < 0 || yCoord >= row || xCoord < 0 || xCoord >= col) return {}; //out of bounds check 
 
@@ -199,17 +236,20 @@ HeldPiece Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int
     }
     std::pair <int, int> firstPair = indexPairs.front(); // sets the first pair to whatever pair was at the fornt of the vector
 
+    // sets inital x and y to the first pair within the unordered indexPairs
     int initialX = firstPair.first;
     int initialY = firstPair.second;
     int xCounter = 0;
     int yCounter = 0;
 
+    // sets min and max for x/y tothe first pair first and second values
     int minX = firstPair.first;
     int maxX = firstPair.first;
     int minY = firstPair.second;
     int maxY = firstPair.second;
 
-    for (int i = 1; i < static_cast<int>(indexPairs.size()); i++) { // for loop to find the max and min x and y values
+    // for loop to find the max and min x and y values
+    for (int i = 1; i < static_cast<int>(indexPairs.size()); i++) {
         if (indexPairs[i].first > maxX) {
             maxX = indexPairs[i].first;
         }
@@ -227,7 +267,8 @@ HeldPiece Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int
         }
     }
 
-    for (int i = 0; i < static_cast<int>(indexPairs.size()); i++) { // for loop to count if x or y values are equal to the size of pairs in vecotr of pair (indexPairs)
+    // for loop to count if x or y values are equal to the size of pairs in vector of pair (indexPairs)
+    for (int i = 0; i < static_cast<int>(indexPairs.size()); i++) {
         if (initialX == indexPairs[i].first) { // if we find an x that matches the initial xValue, xcounter++
             xCounter++;
         }
@@ -237,14 +278,18 @@ HeldPiece Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int
         }
     }
 
-    if (xCounter == static_cast<int> (indexPairs.size()) && (maxY - minY + 1) == static_cast<int>(indexPairs.size())) { // checks if the current sum of xCounter and the length between cols is the same as the amount of pairs in index pairs
+    // checks if the current sum of xCounter and the length between cols is the same as the amount of pairs in index pairs
+    if (xCounter == static_cast<int> (indexPairs.size()) && (maxY - minY + 1) == static_cast<int>(indexPairs.size())) {
         isVertical = true; // if the above is true the piece is vertical
     }
 
-    if (yCounter == static_cast<int> (indexPairs.size()) && (maxX - minX + 1) == static_cast<int> (indexPairs.size())) { // checks if the current sum of yCounter and the length between rows is the same as the amount of pairs in index pairs
+    // checks if the current sum of yCounter and the length between rows is the same as the amount of pairs in index pairs
+    if (yCounter == static_cast<int> (indexPairs.size()) && (maxX - minX + 1) == static_cast<int> (indexPairs.size())) {
         isVertical = false; // if the above is true the piece is horizontal
     }
 
+
+    // bubble sort to sort the paris in order of how they were place on the map
     if (isVertical == true) {
         for (int i = 0; i < static_cast<int>(indexPairs.size()) - 1; i++) {
             for (int j = 0; j < static_cast<int>(indexPairs.size()) - i - 1; j++) {
@@ -254,6 +299,7 @@ HeldPiece Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int
         }
     }
 
+    // bubble sort to sort the paris in order of how they were place on the map
     if (isVertical == false) {
         for (int i = 0; i < static_cast<int>(indexPairs.size()) - 1; i++) {
             for (int j = 0; j < static_cast<int>(indexPairs.size()) - i - 1; j++) {
@@ -263,6 +309,7 @@ HeldPiece Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int
         }
     }
 
+    // pass all of our found values to result which if of struct HeldPiece
 
     result.originalCells = indexPairs;
     result.cells.clear();
@@ -280,6 +327,7 @@ HeldPiece Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int
     result.currentX = minX;
     result.currentY = minY;
 
+    // return the newly created struct
     return result;
 }
 
@@ -480,6 +528,7 @@ std::vector<std::vector<int>> Board::initializeIdBoard() {
     return board;
 }
 
+//function to begin a hold of a piece
 bool Board::beginHold(int cursorX, int cursorY) { // passes in the current cell at x y value
     HeldPiece hp = grabPiece(idGrid, cursorX, cursorY); // gets the absolute cells from the retunr in grabPiece ex: {(1,1), (1,2), (1,3)}
 
@@ -499,44 +548,12 @@ bool Board::beginHold(int cursorX, int cursorY) { // passes in the current cell 
     return true;
 }
 
-void Board::updateHoldMove(int dx, int dy) { // pass in the movement of the arrow inputs
-    if (!held.validSelection) return; // if held.validSelection is false we return from the function
-
-    int nextX = held.currentX + dx; // nextX is equal to our currentX plus the x direction movement
-    int nextY = held.currentY + dy; // nextY is equal to our currentX plus the y direction movement
-
-    if (canPlaceHeldAt(nextX, nextY)) { // calls canPlaceHeldAt at the new x and y values to check if piece can be placed
-        held.currentX = nextX; // replaces the current x with nextX;
-        held.currentY = nextY; // replaces the current y with nextX;
-    }
-}
-
-//function to check if we can place a piece at current x/y coord
-bool Board::canPlaceHeldAt(int anchorX, int anchorY) const { // passes in x and y coord that we want to place at
-    if (!held.validSelection) return false; // checks if we have a vliad selection of piece if not we return
-
-    int rows = grid.size();
-    int cols = grid[0].size();
-
-    for (auto& pair : held.cells) {
-        int x = anchorX + pair.first;
-        int y = anchorY + pair.second;
-
-        if (y < 0 || y >= rows || x < 0 || x >= cols) {
-            return false;
-        }
-
-        if (idGrid[y][x] != 0) {
-            return false;
-        }
-    }
-    return true;
-}
-
+//function to comminit a hold of piece
 void Board::commitHold() {
     if (!held.validSelection) return;
 
-    // for each loop grabs the 
+    // for each loop grabs the the normalized cells
+    //and adds the current x/y values to it for proper placement
     for (auto& pair : held.cells) {
         int x = held.currentX + pair.first;
         int y = held.currentY + pair.second;
@@ -547,7 +564,8 @@ void Board::commitHold() {
     }
     held = {};
 }
-
+// function to cancel a hold
+//just places the pice hack to its original points
 void Board::cancelHold() {
     if (!held.validSelection) return;
 
