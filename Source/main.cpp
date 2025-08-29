@@ -24,8 +24,7 @@ int main() {
     board.placeTruckPiece(truck, board.grid, board.idGrid, 3, 1, false);
     board.placeTruckPiece(truck2, board.grid, board.idGrid, 0, 0, true);
 
-    std::vector<std::pair<int, int>> vectorPairs;
-    vectorPairs = board.grabPiece(board.idGrid, 4, 1);
+
 
     int cursorX = 0;
     int cursorY = 0;

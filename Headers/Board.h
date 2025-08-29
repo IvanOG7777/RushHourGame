@@ -40,23 +40,72 @@ class Board {
         
         void printIdBoard();
         
-        bool isInBounds(std::vector<char> &pieceVector, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical);
+        bool isInBounds(
+            std::vector<char>
+            &pieceVector, std::vector<std::vector<char>> &board,
+            int xCoord,
+            int yCoord,
+            bool isVertical
+        );
         
-        bool collides(std:: vector<char> &pieceVector, std::vector<std::vector<char>> &board, int xCoord, int yCoord, bool isVertical);
+        bool collides(
+            std:: vector<char> &pieceVector,
+            std::vector<std::vector<char>> &board,
+            std:: vector<std:: vector <int>> &idBoard,
+            int xCoord,
+            int yCoord,
+            bool isVertical
+        );
         
-        void placeCarPiece(Car &car, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical);
+        void placeCarPiece(
+            Car &car,
+            std::vector<std::vector<char>> &board,
+            std::vector<std::vector <int>>& idBoard,
+            int xCoord,
+            int yCoord,
+            bool isVertical
+        );
         
-        void placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board, std::vector<std::vector<int>>& idBoard,int xCoord, int yCoord, bool isVertical);
+        void placeTruckPiece(
+            Truck &truck,
+            std::vector<std::vector<char>> &board,
+            std::vector<std::vector<int>> &idBoard,
+            int xCoord,
+            int yCoord,
+            bool isVertical
+        );
         
-        void movePieceDynamically(std::vector<char>& pieceVector, std::vector<std::vector<char>>& board, int &xCoord, int &yCoord, bool isVertical, int dx, int dy);
+        void movePieceDynamically(
+            std::vector<char>& pieceVector,
+            std::vector<std::vector<char>>& board,
+            std::vector<std::vector <int>>& idBoard,
+            int &xCoord,
+            int &yCoord,
+            bool isVertical,
+            int dx,
+            int dy
+        );
         
-        HeldPiece grabPiece(std::vector<std::vector<int>>& board, int xCoord, int yCoord);
+        HeldPiece grabPiece(
+            std::vector<std::vector<int>>& board,
+            int xCoord,
+            int yCoord
+        );
         
-        bool beginHold(int cursorX, int cursorY);
+        bool beginHold(
+            int cursorX,
+            int cursorY
+        );
         
-        void updateHoldMove(int dx, int dy);
+        void updateHoldMove(
+            int dx, 
+            int dy
+        );
         
-        bool canPlaceHeldAt(int anchorX, int anchorY) const;
+        bool canPlaceHeldAt(
+            int anchorX, 
+            int anchorY
+        ) const;
         
         void commitHold();
         

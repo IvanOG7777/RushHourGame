@@ -70,7 +70,7 @@ bool Board::isInBounds(std::vector<char> &pieceVector, std::vector<std::vector<c
     return true;
 }
 
-bool Board::collides(std::vector<char> &pieceVector, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical) {
+bool Board::collides(std::vector<char> &pieceVector, std::vector<std::vector<char> > &board, std::vector<std::vector <int>>& idBoard, int xCoord, int yCoord, bool isVertical) {
      bool collision = false;
         if (isInBounds(pieceVector, board, xCoord, yCoord, isVertical) == false) {
             return true;
@@ -82,18 +82,27 @@ bool Board::collides(std::vector<char> &pieceVector, std::vector<std::vector<cha
             for (int k = 0; k < length; k++) {
                 if (board[yCoord][xCoord + k] != '0') return true;
             }
+
+            for (int k = 0; k < length; k++) {
+                if (idBoard[yCoord][xCoord + k] != 0) return true;
+            }
         }
 
         if (isVertical == true) {
             for (int k = 0; k < length; k++) {
                 if (board[yCoord + k][xCoord] != '0') return true;
             }
+
+            for (int k = 0; k < length; k++) {
+                if (idBoard[yCoord + k][xCoord] != 0) return true;
+            }
         }
         return false;
 }
 
-void Board::movePieceDynamically(std::vector<char>& pieceVector, std::vector<std::vector<char>>& board, int &xCoord, int &yCoord, bool isVertical, int dx, int dy) {
+void Board::movePieceDynamically(std::vector<char>& pieceVector, std::vector<std::vector<char>>& board, std::vector<std::vector <int>>& idBoard, int &xCoord, int &yCoord, bool isVertical, int dx, int dy) {
     auto &tempBoard = board;
+    auto& tempIdBoard = idBoard;
     int rows = board.size();
     int cols = board[0].size();
     int length = pieceVector.size();
@@ -113,7 +122,7 @@ void Board::movePieceDynamically(std::vector<char>& pieceVector, std::vector<std
         if (newY < 0 || newY >= rows) return;
     }
 
-    if (collides(pieceVector, board, newX, newY, isVertical) == true) return;
+    if (collides(pieceVector, board, idBoard, newX, newY, isVertical) == true) return;
 
     xCoord = newX;
     yCoord = newY;
@@ -121,6 +130,10 @@ void Board::movePieceDynamically(std::vector<char>& pieceVector, std::vector<std
     if (isVertical == true) {
         for (int k = 0; k < length; k++) {
             tempBoard[yCoord + k][xCoord] = pieceVector[k];
+        }
+
+        for (int k = 0; k < length; k++) {
+            tempIdBoard[yCoord + k][xCoord] = pieceVector[k];
         }
     }
 
@@ -151,6 +164,7 @@ void Board::movePieceDynamically(std::vector<char>& pieceVector, std::vector<std
 HeldPiece Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int yCoord) {
     int row = board.size();
     int col = board[0].size();
+    HeldPiece result;
 
     if (yCoord < 0 || yCoord >= row || xCoord < 0 || xCoord >= col) return {}; //out of bounds check 
 
@@ -262,15 +276,28 @@ HeldPiece Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int
         }
     }
 
-    anchorX = minX;
-    anchorY = minY;
 
+    result.originalCells = indexPairs;
+    result.cells.clear();
+    result.cells.reserve(indexPairs.size());
+    for (const auto& pair : indexPairs) {
+        result.cells.emplace_back(pair.first - minX, pair.second - minY);
+    }
 
-    return held
+    result.validSelection = true;
+    result.pieceId = target;
+    result.glyph = grid[yCoord][xCoord];
+    result.isVertical = (maxX == minX);
+    result.originalAnchorX = minX;
+    result.originalAnchorY = minY;
+    result.currentX = minX;
+    result.currentY = minY;
+
+    return result;
 }
 
-void Board::placeCarPiece(Car &car, std::vector<std::vector<char> > &board, int xCoord, int yCoord, bool isVertical) {
-     if (collides(car.carVector, board, xCoord, yCoord, isVertical) == true) {
+void Board::placeCarPiece(Car &car, std::vector<std::vector<char> > &board, std::vector<std::vector <int>>& idBoard, int xCoord, int yCoord, bool isVertical) {
+     if (collides(car.carVector, board, idBoard, xCoord, yCoord, isVertical) == true) {
             std::cout << "Cant place piece at:" << xCoord << ',' << yCoord << std::endl;
             return;
         }
@@ -323,7 +350,7 @@ void Board::placeCarPiece(Car &car, std::vector<std::vector<char> > &board, int 
 }
 
 void Board::placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board, std:: vector<std::vector<int>> &idBoard, int xCoord, int yCoord, bool isVertical) {
-     if (collides(truck.truckVector, board, xCoord, yCoord, isVertical) == true) {
+     if (collides(truck.truckVector, board, idBoard, xCoord, yCoord, isVertical) == true) {
             std::cout << "Cant place piece at:" << xCoord << ',' << yCoord << std::endl;
             return;
         }
@@ -467,51 +494,19 @@ std::vector<std::vector<int>> Board::initializeIdBoard() {
 }
 
 bool Board::beginHold(int cursorX, int cursorY) { // passes in the current cell at x y value
-    auto absCells = grabPiece(idGrid, cursorX, cursorY); // gets the absolute cells from the retunr in grabPiece ex: {(1,1), (1,2), (1,3)}
+    HeldPiece hp = grabPiece(idGrid, cursorX, cursorY); // gets the absolute cells from the retunr in grabPiece ex: {(1,1), (1,2), (1,3)}
 
-    if (absCells.empty()) return false; // if we happen to return empty vector to absCells and absCells is empty we break out of the fuction
+    if (!hp.validSelection) return false; // if we happen to return empty vector to absCells and absCells is empty we break out of the fuction
 
-    //sets min and max X to first pair.first
-    int minX = absCells[0].first;
-    int maxX = minX;
+    hp.glyph = grid[cursorY][cursorX];
 
-    //sets min and max Y to first pair.second
-    int minY = absCells[0].second;
-    int maxY = minY;
+    held = std::move(hp); // hands over ownership of hp values to global held struct
 
-    // for each loop to find actual min and max X/Y values in all pairs
-    for (auto& pair : absCells) {
-        minX = std::min(minX, pair.first);
-        maxX = std::max(maxX, pair.first);
-
-        minY = std::min(minY, pair.second);
-        maxY = std::max(maxY, pair.second);
-    }
-
-    // if the maxX if equal to minX we have a vertical piece
-    bool isVertical = (maxX == minX);
-
-    held = {}; // resets previous held struct from previous grab
-    held.validSelection = true;
-    held.pieceId = idGrid[cursorY][cursorX];
-    held.glyph = grid[cursorY][cursorX];
-    held.isVertical = isVertical;
-    held.originalAnchorX = minX;
-    held.originalAnchorY = minY;
-    held.currentX = minX;
-    held.currentY = minY;
-    held.originalCells = absCells;
-
-    //Normalzes the footprint relative to our anchor x and y points   
-    for (auto& pair : absCells) {
-        held.cells.push_back({ pair.first - minX, pair.second - minY });
-    }
-
-    // replaces the current space was taking to 0 and '0'
-    // we essentially 'lift' the piece form the board so when we move it its not colliding with its self
-    for (auto& pair : absCells) {
-        grid[pair.second][pair.first] = '0';
-        idGrid[pair.second][pair.first] = 0;
+    for (const auto& cell : held.originalCells) {
+        const int x = cell.first;
+        const int y = cell.second;
+        grid[y][x] = '0';
+        idGrid[y][x] = 0;
     }
 
     return true;

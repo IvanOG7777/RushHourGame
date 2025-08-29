@@ -23,3 +23,13 @@ std::vector<char> Truck:: initializeTruck() const {
     return truckVector;
 }
 
+std::vector <int> Truck::initializeTruckId(int truckId) const {
+    std::vector<int> truckIdVector(truckLength);
+
+    for (int& i : truckIdVector) {
+        i = truckId;
+    }
+
+    return truckIdVector;
+}
+
