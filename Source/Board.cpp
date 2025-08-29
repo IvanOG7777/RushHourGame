@@ -100,7 +100,7 @@ bool Board::collides(std::vector<char> &pieceVector, std::vector<std::vector<cha
         return false;
 }
 
-void Board::movePieceDynamically(std::vector<char>& pieceVector, std::vector<std::vector<char>>& board, std::vector<std::vector <int>>& idBoard, int &xCoord, int &yCoord, bool isVertical, int dx, int dy) {
+void Board::movePieceDynamically(std::vector<char>& pieceVector, std:: vector<int> &pieceIdVector, std::vector<std::vector<char>>& board, std::vector<std::vector <int>>& idBoard, int &xCoord, int &yCoord, bool isVertical, int dx, int dy) {
     auto &tempBoard = board;
     auto& tempIdBoard = idBoard;
     int rows = board.size();
@@ -133,7 +133,7 @@ void Board::movePieceDynamically(std::vector<char>& pieceVector, std::vector<std
         }
 
         for (int k = 0; k < length; k++) {
-            tempIdBoard[yCoord + k][xCoord] = pieceVector[k];
+            tempIdBoard[yCoord + k][xCoord] = pieceIdVector[k];
         }
     }
 
@@ -141,23 +141,10 @@ void Board::movePieceDynamically(std::vector<char>& pieceVector, std::vector<std
         for (int k = 0; k < length; k++) {
             tempBoard[yCoord][xCoord + k] = pieceVector[k];
         }
-    }
 
-    system("cls");
-
-    for (auto &row : tempBoard) {
-        for (auto element : row) {
-            if (element == 'c') {
-                std::cout << "\033[31m" << element << "\033[0m" << " ";
-            }
-            else if (element == 't') {
-                std::cout << "\033[32m" << element << "\033[0m" << " ";
-            }
-            else {
-                std::cout << element << " ";
-            }
+        for (int k = 0; k < length; k++) {
+            tempIdBoard[yCoord][xCoord + k] = pieceIdVector[k];
         }
-        std::cout << std::endl;
     }
 }
 

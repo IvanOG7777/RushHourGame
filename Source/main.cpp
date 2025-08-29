@@ -2,89 +2,163 @@
 // Created by elder on 8/16/2025.
 //
 #include <iostream>
-#include "../Headers//Board.h"
+#include "../Headers/Board.h"
 #include "../Headers/Constants.h"
 #include <windows.h>
 #include <conio.h>
 #undef max
 #undef min
 
-
 int main() {
-
     bool running = true;
-    bool hasPlacedPiece = false;
-    Car car;
-    bool isVertical = false;      // test vertical-only movement
-    int x = 0, y = 1;
-    Truck truck(1);
-    Truck truck2(2); 
     Board board(BOARD_HEIGHT, BOARD_WIDTH);
 
-    board.placeTruckPiece(truck, board.grid, board.idGrid, 3, 1, false);
+    // Demo pieces
+    Truck truck1(1);
+    Truck truck2(2);
+    board.placeTruckPiece(truck1, board.grid, board.idGrid, 3, 1, false);
     board.placeTruckPiece(truck2, board.grid, board.idGrid, 0, 0, true);
 
-
-
-    int cursorX = 0;
-    int cursorY = 0;
+    // Cursor + hold state
+    int cursorX = 0, cursorY = 0;
     bool isHolding = false;
 
+    // Preview buffers (what we draw as the piece while it's being moved)
+    std::vector<char> previewGlyphs;
+    std::vector<int>  previewIds;
+    size_t previewLen = 0;
+
+    //lambda function
     auto redraw = [&]() {
         system("cls");
-        std::cout << "Use arrow keys to move cursor. Enter=Grab/PLace, Esc =Cancel" << std::endl;
-        std::cout << "Cursor at (" << cursorX << "," << cursorY << ") | " << (isHolding ? "[Holding]" : "[Idle]") << std::endl;
-        std::cout << std::endl;
-
+        std::cout << "Use arrow keys to move cursor. Enter=Grab/Place, Esc=Cancel\n";
+        std::cout << "Cursor at (" << cursorX << "," << cursorY << ") | "
+            << (isHolding ? "[Holding]" : "[Idle]") << "\n\n";
         board.printBoard();
-        std::cout << "Id board" << std::endl;
+        std::cout << "ID Board\n";
         board.printIdBoard();
-    };
+        };
+
+
+    //lambda function
+    auto erasePreview = [&]() {
+        if (!isHolding || previewLen == 0) return;
+        // Clear current preview from boards using held.currentX/currentY & orientation
+        for (size_t k = 0; k < previewLen; ++k) {
+            if (board.held.isVertical) {
+                board.grid[board.held.currentY + (int)k][board.held.currentX] = '0';
+                board.idGrid[board.held.currentY + (int)k][board.held.currentX] = 0;
+            }
+            else {
+                board.grid[board.held.currentY][board.held.currentX + (int)k] = '0';
+                board.idGrid[board.held.currentY][board.held.currentX + (int)k] = 0;
+            }
+        }
+        };
+
+    //lambda function
+    auto drawPreview = [&]() {
+        if (!isHolding || previewLen == 0) return;
+        for (size_t k = 0; k < previewLen; ++k) {
+            if (board.held.isVertical) {
+                board.grid[board.held.currentY + (int)k][board.held.currentX] = previewGlyphs[k];
+                board.idGrid[board.held.currentY + (int)k][board.held.currentX] = previewIds[k];
+            }
+            else {
+                board.grid[board.held.currentY][board.held.currentX + (int)k] = previewGlyphs[k];
+                board.idGrid[board.held.currentY][board.held.currentX + (int)k] = previewIds[k];
+            }
+        }
+        };
 
     redraw();
 
     while (running) {
         int ch = _getch();
 
-        if (ch == 27) {
-            if (isHolding) {
+        if (ch == 27) { // ESC key
+            if (isHolding) { // if we are holding a piece and press esc
+                // return piece back to its inital state it was grabbed at
+                erasePreview();
                 board.cancelHold();
+                previewGlyphs.clear();
+                previewIds.clear();
+                previewLen = 0;
                 isHolding = false;
                 redraw();
             }
-            else {
-                running = false;
+            else { // else close the game
+                running = false; 
             }
-            continue;
+            continue; // skip all of the below
         }
 
+        // Arrow keys
         if (ch == 224) {
             int arrow = _getch();
 
             if (!isHolding) {
-                if (arrow == 72 && cursorY > 0) cursorY--;
-                if (arrow == 80 && cursorY < BOARD_HEIGHT) cursorY++;
-                if (arrow == 75 && cursorX > 0) cursorX--;
-                if (arrow == 77 && cursorX < BOARD_WIDTH) cursorX++;
+                // Move cursor (keep within bounds)
+                if (arrow == 72 && cursorY > 0) cursorY--;                           // Up
+                if (arrow == 80 && cursorY < BOARD_HEIGHT - 1) cursorY++;            // Down
+                if (arrow == 75 && cursorX > 0) cursorX--;                            // Left
+                if (arrow == 77 && cursorX < BOARD_WIDTH - 1) cursorX++;            // Right
+                redraw();
             }
             else {
-                int dx = 0;
-                int dy = 0;
-                if (arrow == 72) dy = -1;
-                if (arrow == 80) dy = +1;
-                if (arrow == 75) dx = -1;
-                if (arrow == 77) dx = +1;
+                // Move the held piece preview (axis-limited)
+                int dx = 0, dy = 0;
+                if (board.held.isVertical) {
+                    if (arrow == 72) dy = -1;   // Up
+                    if (arrow == 80) dy = +1;   // Down
+                }
+                else {
+                    if (arrow == 75) dx = -1;   // Left
+                    if (arrow == 77) dx = +1;   // Right
+                }
 
-                board.updateHoldMove(dx, dy);
+                if (dx == 0 && dy == 0) {
+                    redraw();
+                    continue;
+                }
+
+                // 1) erase old preview from boards
+                erasePreview();
+
+                // 2) ask board to move & draw the new preview in place
+                board.movePieceDynamically(
+                    previewGlyphs,            // glyphs for each cell of the held piece
+                    previewIds,               // ids for each cell of the held piece
+                    board.grid,
+                    board.idGrid,
+                    board.held.currentX,      // updated by ref on a legal move
+                    board.held.currentY,      // updated by ref on a legal move
+                    board.held.isVertical,
+                    dx, dy
+                );
+
+                // If move was illegal, nothing changed and cells remain cleared;
+                // so redraw to reflect it. If legal, movePieceDynamically wrote
+                // the new preview already.
+                redraw();
             }
-            redraw();
             continue;
         }
 
+        // ENTER
         if (ch == 13) {
             if (!isHolding) {
+                // Try to start holding a piece under the cursor
                 if (board.beginHold(cursorX, cursorY)) {
                     isHolding = true;
+
+                    // Build preview payload once from held footprint length
+                    previewLen = board.held.cells.size();
+                    previewGlyphs.assign(previewLen, board.held.glyph);
+                    previewIds.assign(previewLen, board.held.pieceId);
+
+                    // Draw initial preview at current anchor
+                    drawPreview();
                 }
                 else {
                     std::cout << "No piece at (" << cursorX << "," << cursorY << ") to grab" << std::endl;
@@ -92,14 +166,17 @@ int main() {
                 }
             }
             else {
-                board.commitHold();
+                // Commit the held piece to its current spot
+                erasePreview();          // remove preview
+                board.commitHold();      // write permanent cells
+                previewGlyphs.clear();
+                previewIds.clear();
+                previewLen = 0;
                 isHolding = false;
             }
             redraw();
             continue;
         }
     }
-
     return 0;
-
 }

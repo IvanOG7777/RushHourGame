@@ -77,6 +77,7 @@ class Board {
         
         void movePieceDynamically(
             std::vector<char>& pieceVector,
+            std::vector<int>& pieceIdVector,
             std::vector<std::vector<char>>& board,
             std::vector<std::vector <int>>& idBoard,
             int &xCoord,
