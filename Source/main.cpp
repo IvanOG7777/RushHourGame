@@ -35,11 +35,12 @@ int main() {
     //lambda function
     auto redraw = [&]() {
         system("cls");
-        std::cout << "Use arrow keys to move cursor. Enter=Grab/Place, Esc=Cancel\n";
+        std::cout << "Use arrow keys to move cursor. Enter=Grab/Place, Esc=Cancel" << std::endl;
         std::cout << "Cursor at (" << cursorX << "," << cursorY << ") | "
-            << (isHolding ? "[Holding]" : "[Idle]") << "\n\n";
-        board.printBoard();
-        std::cout << "ID Board\n";
+            << (isHolding ? "[Holding]" : "[Idle]") << std::endl;
+        std::cout << std::endl;
+        board.printBoard(cursorX, cursorY);
+        std::cout << "ID Board" << std:: endl;
         board.printIdBoard();
         };
 

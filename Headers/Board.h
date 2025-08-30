@@ -36,7 +36,10 @@ class Board {
         
         HeldPiece held;
         
-        void printBoard();
+        void printBoard(
+            int cursorX,
+            int cursorY
+            );
         
         void printIdBoard();
         

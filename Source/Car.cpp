@@ -3,7 +3,6 @@
 //
 #include "../Headers/Car.h"
 #include <iostream>
-#include <vector>
 
 
 Car::Car(int passedId) : carId(passedId), carLength(2), carVector(initalizeCarVector()) {}

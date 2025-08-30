@@ -17,24 +17,36 @@ Board::Board(int passedHeight, int passedWidth) : height(passedHeight), width(pa
 
 
 //function used to print board
-//TODO, each piece has a specific id so if element comes across that unique id print only its color, no sharing colors
-void Board::printBoard() {
-    for (auto &row: grid) {
-        for (auto element: row) {
-            if (element == 'c') {
-                std::cout << "\033[31m" << element << "\033[0m" << " ";
-            } else if (element == 't') {
-                std::cout << "\033[32m" << element << "\033[0m" << " ";
-            } else {
-                std::cout << element << " ";
+void Board::printBoard(int cursorX, int cursorY) {
+
+    if (grid.empty() || grid[0].empty()) return;
+
+    int rows = static_cast<int>(grid.size());
+    int cols = static_cast<int>(grid[0].size());
+
+    for (int row = 0; row < rows; row++) {
+        for (int col = 0; col < cols; col++) {
+            const char ch = grid[row][col];
+            const bool isCursor = (col == cursorX && row == cursorY);
+
+            if (isCursor) {
+                std::cout << "\033[7m";
             }
+
+            if (ch == 'c') {
+                std::cout << "\033[31m";
+            }
+            else if (ch == 't') {
+                std::cout << "\033[32m";
+            }
+
+            std::cout << ch << "\033[0m" << ' ';
         }
         std::cout << std::endl;
     }
 }
 
 //prints the id to the board
-// todo same as printBoard();
 void Board::printIdBoard() {
     for (auto &row : idGrid) {
         for (auto element : row) {
@@ -349,15 +361,31 @@ void Board::placeCarPiece(Car &car, std::vector<std::vector<char> > &board, std:
                         }
                         if (board[yCoord][xCoord + 1] == '0')
                             board[yCoord][xCoord + 1] = car.carVector[1];
+
+                        if (idBoard[yCoord][xCoord] == 0) {
+                            idBoard[yCoord][xCoord] = car.carId;
+                        }
+
+                        if (idBoard[yCoord][xCoord + 1] == 0) {
+                            idBoard[yCoord][xCoord + 1] = car.carId;
+                        }
                   
             } else if ((yCoord >= 0 && yCoord < row) && (xCoord >= 0) && (xCoord - (length - 1) >= 0)) {
                 
                         if (board[yCoord][xCoord] == '0') {
                             board[yCoord][xCoord] = car.carVector[0];
                         }
-                        if (board[yCoord][xCoord - 1] == '0')
+                        if (board[yCoord][xCoord - 1] == '0') {
                             board[yCoord][xCoord - 1] = car.carVector[1];
-                  
+                        }
+
+                        if (idBoard[yCoord][xCoord] == 0) {
+                            idBoard[yCoord][xCoord] = car.carId;
+                        }
+
+                        if (idBoard[yCoord][xCoord - 1] == 0) {
+                            idBoard[yCoord][xCoord - 1] = car.carId;
+                        }
             }
         }
 
@@ -367,16 +395,33 @@ void Board::placeCarPiece(Car &car, std::vector<std::vector<char> > &board, std:
                         if (board[yCoord][xCoord] == '0') {
                             board[yCoord][xCoord] = car.carVector[0];
                         }
-                        if (board[yCoord + 1][xCoord] == '0')
+                        if (board[yCoord + 1][xCoord] == '0') {
                             board[yCoord + 1][xCoord] = car.carVector[1];
+                        }
+
+                        if (idBoard[yCoord][xCoord] == 0) {
+                            idBoard[yCoord][xCoord] = car.carId;
+                        }
+                        if (idBoard[yCoord + 1][xCoord] == 0) {
+                            idBoard[yCoord + 1][xCoord] = car.carId;
+                        }
+
                  
             } else if ((xCoord >= 0 && xCoord < col) && (yCoord >= 0) && (yCoord - (length - 1) >= 0)) {
                 
                         if (board[yCoord][xCoord] == '0') {
                             board[yCoord][xCoord] = car.carVector[0];
                         }
-                        if (board[yCoord - 1][xCoord] == '0')
+                        if (board[yCoord - 1][xCoord] == '0') {
                             board[yCoord - 1][xCoord] = car.carVector[1];
+                        }
+
+                        if (idBoard[yCoord][xCoord] == 0) {
+                            idBoard[yCoord][xCoord] = car.carId;
+                        }
+                        if (idBoard[yCoord - 1][xCoord] == 0) {
+                            idBoard[yCoord - 1][xCoord] = car.carId;
+                        }
             }
         }
         else {
