@@ -6,6 +6,7 @@
 #define BOARD_H
 #include "../Headers/Car.h"
 #include "../Headers/Truck.h"
+#include "../Headers/Constants.h"
 #include <vector>
 
 struct HeldPiece {
@@ -25,15 +26,39 @@ struct HeldPiece {
     std::vector<std::pair<int, int>> cells; // holds the normalized vector of pairs from the piece
 };
 
+enum class PieceKind {
+    Car,
+    Truck,
+    RedCar,
+};
+
+struct LevelPiece {
+    PieceKind kind;
+    int id;
+    int x, y;
+    bool isVertical;
+};
+
+struct Level {
+    int width, height;
+    std::vector<LevelPiece> pieces;
+};
+
 class Board {
     public:
 
         int height;
         int width;
+
+        int exitRow = 2;
+        int redCarId = 0;
+        bool hasWon = false;
+
         std:: vector<std:: vector<char>> grid;
-        std:: vector<std::vector<int>> idGrid;
+        std::vector<std::vector<int>> idGrid;
         Board(int height, int width);
-        
+
+
         HeldPiece held;
         
         void printBoard(
@@ -104,6 +129,10 @@ class Board {
         void commitHold();
         
         void cancelHold();
+
+        void reset();
+
+        void loadLevel(const Level &level);
 
 private:
     std:: vector<std:: vector<char>> initializeBoard();

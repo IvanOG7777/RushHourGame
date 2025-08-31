@@ -13,15 +13,26 @@ int main() {
     bool running = true;
     Board board(BOARD_HEIGHT, BOARD_WIDTH);
 
+    const Level tutorial{
+    BOARD_WIDTH, BOARD_HEIGHT,
+    {
+        { PieceKind::RedCar,  3, 2, 2, false },
+        { PieceKind::Truck,   1, 0, 0, true  },
+        { PieceKind::Truck,   2, 3, 1, false }
+    }
+    };
+
+    board.loadLevel(tutorial);
+
     //Demo pieces
-    Truck truck1(1);
+    /*Truck truck1(1);
     Truck truck2(2);
     Car car1(3);
     Car car2(4);
     board.placeTruckPiece(truck1, board.grid, board.idGrid, 3, 1, false);
     board.placeTruckPiece(truck2, board.grid, board.idGrid, 0, 0, true);
     board.placeCarPiece(car1, board.grid, board.idGrid, 2, 2, true);
-    board.placeCarPiece(car2, board.grid, board.idGrid, 5, 3, false);
+    board.placeCarPiece(car2, board.grid, board.idGrid, 5, 3, false);*/
 
     // Cursor + hold state
     int cursorX = 0, cursorY = 0;

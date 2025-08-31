@@ -159,6 +159,14 @@ void Board::movePieceDynamically(std::vector<char>& pieceVector, std:: vector<in
     // if the piece is vertical
     if (isVertical == false) {
         //bounds checker
+
+        // TODO FIX THIS
+        if (pieceIdVector[0] == redCarId && isVertical == false && newY == exitRow && newX + length - 1 == cols) {
+            xCoord = newX;
+            yCoord = newY;
+            hasWon = true;
+            return;
+        }
         if (newX < 0 || (newX + length - 1) >= cols) return;
         if (newY < 0 || newY >= rows) return;
     }
@@ -619,4 +627,28 @@ void Board::cancelHold() {
         idGrid[pair.second][pair.first] = held.pieceId;
     }
     held = {};
+}
+
+void Board::reset() {
+    grid = initializeBoard();
+    idGrid = initializeIdBoard();
+    held = {};
+}
+
+void Board::loadLevel(const Level &level) {
+    reset();
+
+    for (const auto& piece : level.pieces) {
+        if (piece.kind == PieceKind::Truck) {
+            Truck truck(piece.id);
+            placeTruckPiece(truck, grid, idGrid, piece.x, piece.y, piece.isVertical);
+        }
+        else {
+            Car car(piece.id);
+            placeCarPiece(car, grid, idGrid, piece.x, piece.y, piece.isVertical);
+            if (piece.kind == PieceKind::RedCar) {
+                redCarId = piece.id;
+            }
+        }
+    }
 }
