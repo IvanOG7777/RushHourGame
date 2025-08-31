@@ -49,14 +49,23 @@ int main() {
     auto erasePreview = [&]() {
         if (!isHolding || previewLen == 0) return;
         // Clear current preview from boards using held.currentX/currentY & orientation
-        for (size_t k = 0; k < previewLen; ++k) {
-            if (board.held.isVertical) {
-                board.grid[board.held.currentY + (int)k][board.held.currentX] = '0';
-                board.idGrid[board.held.currentY + (int)k][board.held.currentX] = 0;
+
+        if (board.held.isVertical) {
+            for (auto& pair : board.held.cells) {
+                int px = board.held.currentX;
+                int py = board.held.currentY + pair.second;
+
+                board.grid[py][px] = '0';
+                board.idGrid[py][px] = 0;
             }
-            else {
-                board.grid[board.held.currentY][board.held.currentX + (int)k] = '0';
-                board.idGrid[board.held.currentY][board.held.currentX + (int)k] = 0;
+        }
+        else {
+            for (auto& pair : board.held.cells) {
+                int px = board.held.currentX + pair.first;
+                int py = board.held.currentY;
+
+                board.grid[py][px] = '0';
+                board.idGrid[py][px] = 0;
             }
         }
         };
@@ -64,14 +73,23 @@ int main() {
     //lambda function
     auto drawPreview = [&]() {
         if (!isHolding || previewLen == 0) return;
-        for (size_t k = 0; k < previewLen; ++k) {
-            if (board.held.isVertical) {
-                board.grid[board.held.currentY + (int)k][board.held.currentX] = previewGlyphs[k];
-                board.idGrid[board.held.currentY + (int)k][board.held.currentX] = previewIds[k];
+
+        if (board.held.isVertical) {
+            for (auto& pair : board.held.cells) {
+                int px = board.held.currentX;
+                int py = board.held.currentY + pair.second;
+
+                board.grid[py][px] = board.held.glyph;
+                board.idGrid[py][px] = board.held.pieceId;
             }
-            else {
-                board.grid[board.held.currentY][board.held.currentX + (int)k] = previewGlyphs[k];
-                board.idGrid[board.held.currentY][board.held.currentX + (int)k] = previewIds[k];
+        }
+        else {
+            for (auto& pair : board.held.cells) {
+                int px = board.held.currentX + pair.first;
+                int py = board.held.currentY;
+
+                board.grid[py][px] = board.held.glyph;
+                board.idGrid[py][px] = board.held.pieceId;
             }
         }
         };
@@ -139,8 +157,11 @@ int main() {
                     board.held.currentX,      // updated by ref on a legal move
                     board.held.currentY,      // updated by ref on a legal move
                     board.held.isVertical,
-                    dx, dy
+                    dx,
+                    dy
                 );
+
+                drawPreview();
 
                 // If move was illegal, nothing changed and cells remain cleared;
                 // so redraw to reflect it. If legal, movePieceDynamically wrote
