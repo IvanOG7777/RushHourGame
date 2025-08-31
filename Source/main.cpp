@@ -13,7 +13,7 @@ int main() {
     bool running = true;
     Board board(BOARD_HEIGHT, BOARD_WIDTH);
 
-    // Demo pieces
+    //Demo pieces
     Truck truck1(1);
     Truck truck2(2);
     Car car1(3);
@@ -102,6 +102,10 @@ int main() {
         if (ch == 27) { // ESC key
             if (isHolding) { // if we are holding a piece and press esc
                 // return piece back to its inital state it was grabbed at
+                int ax = board.held.currentX;      // or board.held.originalAnchorX
+                int ay = board.held.currentY;
+                cursorX = ax;
+                cursorY = ay;
                 erasePreview();
                 board.cancelHold();
                 previewGlyphs.clear();
@@ -148,6 +152,10 @@ int main() {
                 // 1) erase old preview from boards
                 erasePreview();
 
+                //
+                int oldX = board.held.currentX;
+                int oldY = board.held.currentY;
+
                 // 2) ask board to move & draw the new preview in place
                 board.movePieceDynamically(
                     previewGlyphs,            // glyphs for each cell of the held piece
@@ -160,6 +168,12 @@ int main() {
                     dx,
                     dy
                 );
+
+                // if anchor changed, follow it with the highlight
+                if (board.held.currentX != oldX || board.held.currentY != oldY) {
+                    cursorX = board.held.currentX;
+                    cursorY = board.held.currentY;
+                }
 
                 drawPreview();
 
@@ -178,23 +192,39 @@ int main() {
                 if (board.beginHold(cursorX, cursorY)) {
                     isHolding = true;
 
+                    //syncs the cursor to the current held x/y coord
+                    cursorX = board.held.currentX;
+                    cursorY = board.held.currentY;
+
                     // Build preview payload once from held footprint length
                     previewLen = board.held.cells.size();
                     previewGlyphs.assign(previewLen, board.held.glyph);
                     previewIds.assign(previewLen, board.held.pieceId);
+
+                    drawPreview();
 
                     // Draw initial preview at current anchor
                     drawPreview();
                 }
                 else {
                     std::cout << "No piece at (" << cursorX << "," << cursorY << ") to grab" << std::endl;
-                    Sleep(500);
+                    Sleep(750);
                 }
             }
             else {
                 // Commit the held piece to its current spot
+                int ax = board.held.currentX;
+                int ay = board.held.currentY;
+
+                // Commit the held piece to its current spot
                 erasePreview();          // remove preview
                 board.commitHold();      // write permanent cells
+                
+                // keep highlight where the piece landed
+                cursorX = ax;
+                cursorY = ay;
+
+
                 previewGlyphs.clear();
                 previewIds.clear();
                 previewLen = 0;
