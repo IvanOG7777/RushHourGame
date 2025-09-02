@@ -27,23 +27,6 @@ struct HeldPiece {
     std::vector<std::pair<int, int>> cells; // holds the normalized vector of pairs from the piece
 };
 
-enum class PieceKind {
-    Car,
-    Truck,
-    RedCar,
-};
-
-struct LevelPiece {
-    PieceKind kind;
-    int id;
-    int x, y;
-    bool isVertical;
-};
-
-struct Level {
-    int width, height;
-    std::vector<LevelPiece> pieces;
-};
 
 class Board {
     public:
