@@ -7,6 +7,7 @@
 #include "../Headers/Car.h"
 #include "../Headers/Truck.h"
 #include "../Headers/Constants.h"
+#include "../Headers/Level.h"
 #include <vector>
 
 struct HeldPiece {
