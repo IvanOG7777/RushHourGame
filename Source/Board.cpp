@@ -161,11 +161,10 @@ void Board::movePieceDynamically(std::vector<char>& pieceVector, std:: vector<in
         //bounds checker
 
         // TODO FIX THIS
-        if (pieceIdVector[0] == redCarId && isVertical == false && newY == exitRow && newX + length - 1 == cols) {
+        if (pieceIdVector[0] == redCarId && isVertical == false && newY == exitRow && newX + length - 1 >= cols) {
             xCoord = newX;
             yCoord = newY;
             hasWon = true;
-            return;
         }
         if (newX < 0 || (newX + length - 1) >= cols) return;
         if (newY < 0 || newY >= rows) return;
@@ -543,8 +542,8 @@ void Board::placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board
                         if (idBoard[yCoord - 1][xCoord] == 0) {
                             idBoard[yCoord - 1][xCoord] = truck.truckId;
                         }
-                        if (idBoard[yCoord - 1][xCoord] == 0) {
-                            idBoard[yCoord - 1][xCoord] = truck.truckId;
+                        if (idBoard[yCoord - 2][xCoord] == 0) {
+                            idBoard[yCoord - 2][xCoord] = truck.truckId;
                         }
             }
             else {

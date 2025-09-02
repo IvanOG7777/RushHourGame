@@ -24,16 +24,6 @@ int main() {
 
     board.loadLevel(tutorial);
 
-    //Demo pieces
-    /*Truck truck1(1);
-    Truck truck2(2);
-    Car car1(3);
-    Car car2(4);
-    board.placeTruckPiece(truck1, board.grid, board.idGrid, 3, 1, false);
-    board.placeTruckPiece(truck2, board.grid, board.idGrid, 0, 0, true);
-    board.placeCarPiece(car1, board.grid, board.idGrid, 2, 2, true);
-    board.placeCarPiece(car2, board.grid, board.idGrid, 5, 3, false);*/
-
     // Cursor + hold state
     int cursorX = 0, cursorY = 0;
     bool isHolding = false;
@@ -75,6 +65,12 @@ int main() {
                 int px = board.held.currentX + pair.first;
                 int py = board.held.currentY;
 
+                if (px >= board.width) {
+                    board.grid[py][px - 1] = '0';
+                    board.idGrid[py][px - 1] = 0;
+                    return;
+                }
+
                 board.grid[py][px] = '0';
                 board.idGrid[py][px] = 0;
             }
@@ -95,9 +91,16 @@ int main() {
             }
         }
         else {
+
             for (auto& pair : board.held.cells) {
                 int px = board.held.currentX + pair.first;
                 int py = board.held.currentY;
+
+                if (px >= board.width) {
+                    board.grid[py][px - 1] = board.held.glyph;
+                    board.idGrid[py][px - 1] = board.held.pieceId;
+                    return;
+                }
 
                 board.grid[py][px] = board.held.glyph;
                 board.idGrid[py][px] = board.held.pieceId;
@@ -179,6 +182,13 @@ int main() {
                     dx,
                     dy
                 );
+
+                if (board.hasWon == true) {
+                    drawPreview();
+                    redraw();
+                    std::cout << "You have won" << std::endl;
+                    break;
+                }
 
                 // if anchor changed, follow it with the highlight
                 if (board.held.currentX != oldX || board.held.currentY != oldY) {
