@@ -9,20 +9,21 @@
 #undef max
 #undef min
 
-int main() {
-    bool running = true;
-    Board board(BOARD_HEIGHT, BOARD_WIDTH);
 
-    const Level tutorial{
-    BOARD_WIDTH, BOARD_HEIGHT,
-    {
-        { PieceKind::RedCar,  3, 2, 2, false },
-        { PieceKind::Truck,   1, 0, 0, true  },
-        { PieceKind::Truck,   2, 3, 1, false }
-    }
+int main() {
+
+    enum GameState {
+        Playing,
+        Won,
+        PackComplete
     };
 
-    board.loadLevel(tutorial);
+    GameState state = Playing;
+
+    int currentLevel = 0;
+
+    bool running = true;
+    Board board(BOARD_HEIGHT, BOARD_WIDTH);
 
     // Cursor + hold state
     int cursorX = 0, cursorY = 0;
@@ -108,6 +109,22 @@ int main() {
         }
         };
 
+    auto loadLevelIndex = [&](int index) {
+        if (isHolding) erasePreview();
+        isHolding = false;
+        previewGlyphs.clear();
+        previewIds.clear();
+        previewLen = 0;
+
+        board.loadLevel(levelAt(index));
+        cursorX = 0;
+        cursorY = 0;
+        state = GameState::Playing;
+        redraw();
+        };
+
+    loadLevelIndex(currentLevel);
+
     redraw();
 
     while (running) {
@@ -147,6 +164,12 @@ int main() {
                 redraw();
             }
             else {
+
+                if (state != GameState::Playing) {
+                    redraw();
+                    continue;
+                };
+
                 // Move the held piece preview (axis-limited)
                 int dx = 0, dy = 0;
                 if (board.held.isVertical) {
@@ -184,10 +207,16 @@ int main() {
                 );
 
                 if (board.hasWon == true) {
-                    drawPreview();
-                    redraw();
-                    std::cout << "You have won" << std::endl;
-                    break;
+                    erasePreview();
+                    isHolding = false;
+                    previewGlyphs.clear();
+                    previewIds.clear();
+                    previewLen = 0;
+                    state = GameState::Won;
+
+                    // Optional: print a banner line before redraw()
+                    std::cout << "\nSolved! Press Enter for next level.\n";
+                    continue;
                 }
 
                 // if anchor changed, follow it with the highlight
@@ -208,51 +237,66 @@ int main() {
 
         // ENTER
         if (ch == 13) {
-            if (!isHolding) {
-                // Try to start holding a piece under the cursor
-                if (board.beginHold(cursorX, cursorY)) {
-                    isHolding = true;
 
-                    //syncs the cursor to the current held x/y coord
-                    cursorX = board.held.currentX;
-                    cursorY = board.held.currentY;
+            if (state == GameState::Playing) {
+                if (!isHolding) {
+                    // Try to start holding a piece under the cursor
+                    if (board.beginHold(cursorX, cursorY)) {
+                        isHolding = true;
 
-                    // Build preview payload once from held footprint length
-                    previewLen = board.held.cells.size();
-                    previewGlyphs.assign(previewLen, board.held.glyph);
-                    previewIds.assign(previewLen, board.held.pieceId);
+                        //syncs the cursor to the current held x/y coord
+                        cursorX = board.held.currentX;
+                        cursorY = board.held.currentY;
 
-                    drawPreview();
+                        // Build preview payload once from held footprint length
+                        previewLen = board.held.cells.size();
+                        previewGlyphs.assign(previewLen, board.held.glyph);
+                        previewIds.assign(previewLen, board.held.pieceId);
 
-                    // Draw initial preview at current anchor
-                    drawPreview();
+                        drawPreview();
+
+                        // Draw initial preview at current anchor
+                        drawPreview();
+                    }
+                    else {
+                        std::cout << "No piece at (" << cursorX << "," << cursorY << ") to grab" << std::endl;
+                        Sleep(750);
+                    }
                 }
                 else {
-                    std::cout << "No piece at (" << cursorX << "," << cursorY << ") to grab" << std::endl;
-                    Sleep(750);
+                    // Commit the held piece to its current spot
+                    int ax = board.held.currentX;
+                    int ay = board.held.currentY;
+
+                    // Commit the held piece to its current spot
+                    erasePreview();          // remove preview
+                    board.commitHold();      // write permanent cells
+
+                    // keep highlight where the piece landed
+                    cursorX = ax;
+                    cursorY = ay;
+
+
+                    previewGlyphs.clear();
+                    previewIds.clear();
+                    previewLen = 0;
+                    isHolding = false;
                 }
+                redraw();
+                continue;
             }
-            else {
-                // Commit the held piece to its current spot
-                int ax = board.held.currentX;
-                int ay = board.held.currentY;
-
-                // Commit the held piece to its current spot
-                erasePreview();          // remove preview
-                board.commitHold();      // write permanent cells
-                
-                // keep highlight where the piece landed
-                cursorX = ax;
-                cursorY = ay;
-
-
-                previewGlyphs.clear();
-                previewIds.clear();
-                previewLen = 0;
-                isHolding = false;
+            else if (state == GameState::Won) {
+                if (currentLevel + 1 < levelCount()) {
+                    currentLevel = nextIndex(currentLevel);
+                    loadLevelIndex(currentLevel);
+                }
+                else {
+                    state = GameState::PackComplete;
+                    std::cout << "\nPack complete! Press R to restart.\n";
+                    redraw();
+                }
+                continue;
             }
-            redraw();
-            continue;
         }
     }
     return 0;

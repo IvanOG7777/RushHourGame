@@ -3,6 +3,8 @@
 #include <vector>
 #include <stdexcept>
 
+
+//vector of levels of Type Level
 static const std::vector<Level> levels = {
     Level{ BOARD_WIDTH, BOARD_HEIGHT, {
         { PieceKind::RedCar,  3, 2, 2, false },
@@ -35,5 +37,11 @@ bool hasLevel(int index) {
 }
 
 int nextIndex(int index) {
-    return (index + 1 < static_cast<int>(levels.size())) ? index + 1 : index;
+
+    if (index + 1 < static_cast<int>(levels.size())) {
+        return index + 1;
+    }
+    else {
+        return index;
+    }
 }
