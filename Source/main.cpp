@@ -120,6 +120,7 @@ int main() {
         cursorX = 0;
         cursorY = 0;
         state = GameState::Playing;
+        board.hasWon = false;
         redraw();
         };
 
@@ -130,7 +131,15 @@ int main() {
     while (running) {
         int ch = _getch();
 
-        if (ch == 27) { // ESC key
+        if (state == GameState:: PackComplete && ch == 'r' || ch == 'R') {
+            currentLevel = 0;
+            loadLevelIndex(currentLevel);
+            state = GameState::Playing;
+            board.hasWon = false;
+            redraw();
+        }
+
+        if (ch == 27 && state == GameState::Won || state == GameState:: PackComplete) { // ESC key
             if (isHolding) { // if we are holding a piece and press esc
                 // return piece back to its inital state it was grabbed at
                 int ax = board.held.currentX;      // or board.held.originalAnchorX
@@ -152,7 +161,7 @@ int main() {
         }
 
         // Arrow keys
-        if (ch == 224) {
+        if (ch == 224 && state == GameState:: Playing) {
             int arrow = _getch();
 
             if (!isHolding) {
@@ -215,7 +224,8 @@ int main() {
                     state = GameState::Won;
 
                     // Optional: print a banner line before redraw()
-                    std::cout << "\nSolved! Press Enter for next level.\n";
+                    std::cout << std::endl;
+                    std::cout << "Solved! Press Enter for next level." << std::endl;
                     continue;
                 }
 
@@ -292,8 +302,8 @@ int main() {
                 }
                 else {
                     state = GameState::PackComplete;
-                    std::cout << "\nPack complete! Press R to restart.\n";
-                    redraw();
+                    std::cout << std::endl;
+                    std::cout << "Pack complete! Press R to restart." << std::endl;
                 }
                 continue;
             }

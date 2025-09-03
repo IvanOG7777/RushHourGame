@@ -8,8 +8,51 @@
 #include <vector>
 #include <queue>
 #include  <map>
+#include <windows.h>
+
+bool useColor = true;
+std:: string redSGR = "31";
+std::vector<std:: string> palette = { "34", "32", "36", "33", "35", "94", "92", "96", "93", "95", "90" };
+
+static inline void enableVTOnce() {
+    static bool done = false;
+    if (done) return;
+
+    done = true;
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (hOut == INVALID_HANDLE_VALUE) return;
+
+    DWORD mode = 0;
+    if (!GetConsoleMode(hOut, &mode)) return;
+    mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    SetConsoleMode(hOut, mode);
+}
+
+static inline std::string getColorSGR(int pieceId, int redCarId) {
+    if (!useColor || pieceId == 0) return "";
+    if (pieceId == redCarId) return redSGR; // keep goal car red
+    const size_t n = palette.size();
+    const size_t idx = static_cast<size_t>(pieceId) % (n == 0 ? 1 : n);
+    return n ? palette[idx] : "";
+}
+
+static inline void beginCellStyle(int pieceId, bool isCursor, bool isPreview, int redCarId) {
+    const std::string sgr = getColorSGR(pieceId, redCarId);
+    if (!sgr.empty()) std::cout << "\033[" << sgr << "m";  // set color
+    if (isPreview)     std::cout << "\033[2m";             // dim (optional)
+    if (isCursor)      std::cout << "\033[7m";             // reverse video
+}
+
+static inline void endCellStyle() {
+    std::cout << "\033[0m";
+}
+
+
 
 Board::Board(int passedHeight, int passedWidth) : height(passedHeight), width(passedWidth) { // passes the height nad width of map
+
+    enableVTOnce();
+
     //initializes the char grid and id grid
     grid = initializeBoard();
     idGrid = initializeIdBoard();
@@ -27,20 +70,16 @@ void Board::printBoard(int cursorX, int cursorY) {
     for (int row = 0; row < rows; row++) {
         for (int col = 0; col < cols; col++) {
             const char ch = grid[row][col];
+            const int pid = idGrid[row][col];
             const bool isCursor = (col == cursorX && row == cursorY);
 
-            if (isCursor) {
-                std::cout << "\033[7m";
-            }
+            bool isPreview = false;
 
-            if (ch == 'c') {
-                std::cout << "\033[31m";
-            }
-            else if (ch == 't') {
-                std::cout << "\033[32m";
-            }
+            beginCellStyle(pid, isCursor, isPreview, redCarId);
+            std::cout << ch;
+            endCellStyle();
+            std::cout << ' ';
 
-            std::cout << ch << "\033[0m" << ' ';
         }
         std::cout << std::endl;
     }
@@ -48,6 +87,9 @@ void Board::printBoard(int cursorX, int cursorY) {
 
 //prints the id to the board
 void Board::printIdBoard() {
+
+    if (idGrid.empty() || idGrid[0].empty()) return;
+
     for (auto &row : idGrid) {
         for (auto element : row) {
             std::cout << element << " ";
@@ -160,7 +202,6 @@ void Board::movePieceDynamically(std::vector<char>& pieceVector, std:: vector<in
     if (isVertical == false) {
         //bounds checker
 
-        // TODO FIX THIS
         if (pieceIdVector[0] == redCarId && isVertical == false && newY == exitRow && newX + length - 1 >= cols) {
             xCoord = newX;
             yCoord = newY;
@@ -616,6 +657,7 @@ void Board::commitHold() {
     }
     held = {};
 }
+
 // function to cancel a hold
 //just places the pice hack to its original points
 void Board::cancelHold() {
