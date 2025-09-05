@@ -32,4 +32,3 @@ std::vector <int> Truck::initializeTruckId(int truckId) const {
 
     return truckIdVector;
 }
-

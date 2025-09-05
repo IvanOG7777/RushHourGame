@@ -29,4 +29,3 @@ std::vector<int> Car::initializeCarId(int passedId) const {
     }
     return carVector;
 }
-
