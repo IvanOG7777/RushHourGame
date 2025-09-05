@@ -11,20 +11,6 @@
 #undef max
 #undef min
 
-static std::string formatTime(double seconds) {
-    if (seconds < 0) seconds = 0;
-
-    int totalMs = static_cast<int>(seconds * 1000.0 + 0.5);
-    int minutes = totalMs / 60000;
-    int remMS = totalMs % 60000;
-    int sec = remMS / 1000;
-    int millis = remMS % 1000;
-
-    char buf[32];
-    std::snprintf(buf, sizeof(buf), "%02d:%02d.%03d", minutes, sec, millis);
-    return std::string(buf);
-}
-
 int main() {
 
     enum GameState {
@@ -65,18 +51,6 @@ int main() {
         std::cout << "Cursor at (" << cursorX << "," << cursorY << ") | "
             << (isHolding ? "[Holding]" : "[Idle]") << std::endl;
         std::cout << "Current moves: " << currentMoves << std::endl;
-        std::cout << std::endl;
-
-        double showSeconds = 0.0;
-        if (isTimerRunning) {
-            auto now = clock_t::now();
-            showSeconds = std:: chrono::duration_cast<secondsDuration>((now - levelStart) + elapsedBeforePause).count();
-        }
-        else {
-            showSeconds = lastLevelTimeSeconds;
-        }
-
-        std::cout << "Level time: " << formatTime(showSeconds) << std::endl;
         std::cout << std::endl;
 
         board.printBoard(cursorX, cursorY);
@@ -161,11 +135,6 @@ int main() {
         board.hasWon = false;
         currentMoves = 0;
 
-        levelStart = clock_t::now();
-        elapsedBeforePause = secondsDuration{ 0.0 };
-        isTimerRunning = true;
-        lastLevelTimeSeconds = 0.0;
-
         redraw();
         };
 
@@ -175,14 +144,6 @@ int main() {
 
     while (running) {
 
-        auto now = clock_t::now();
-
-        if (now - lastFrame >= frameTime) {
-            redraw();
-            lastFrame = now;
-        }
-
-        if (_kbhit()) {
             int ch = _getch();
 
             if (state == GameState::PackComplete && ch == 'r' || ch == 'R') {
@@ -365,7 +326,6 @@ int main() {
                     }
                     continue;
                 }
-            }
         }
     }
     return 0;
