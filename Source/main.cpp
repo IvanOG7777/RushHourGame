@@ -4,10 +4,12 @@
 #include <iostream>
 #include "../Headers/Board.h"
 #include "../Headers/Constants.h"
+#include "../Headers/Score.h"
 #include <windows.h>
 #include <conio.h>
 #include <chrono>
 #include <cstdio>
+#include <limits>
 #undef max
 #undef min
 
@@ -23,6 +25,9 @@ int main() {
 
     int currentLevel = 0;
     int currentMoves = 0;
+
+    std::string ScoreFile = "scores.txt"; // creates the string ScoreFile and sets it to "scores.txt"
+    std::vector<ScoreEntry> scores = loadScores(levelCount(), ScoreFile); // Initialize 'scores' with one entry per level, loaded from scores.txt
 
     bool running = true;
     Board board(BOARD_HEIGHT, BOARD_WIDTH);
@@ -44,6 +49,17 @@ int main() {
             << (isHolding ? "[Holding]" : "[Idle]") << std::endl;
         std::cout << "Current moves: " << currentMoves << std::endl;
         std::cout << std::endl;
+
+        ScoreEntry& best = scores[currentLevel]; // creates a single ScoreEntry per scores at index i
+        std::cout << "Best for Level " << (currentLevel + 1) << ": ";
+        if (best.bestMoves == std::numeric_limits<int>::max()) { // if the current single ScoreEntry is INTMAX print no best score yet
+            std::cout << "No best score yet";
+        }
+        else {
+            std::cout << best.bestMoves << " moves"; // else print its best move number
+        }
+        std::cout << std::endl << std::endl;
+
 
         board.printBoard(cursorX, cursorY);
         std::cout << "ID Board" << std:: endl;
@@ -113,6 +129,7 @@ int main() {
         }
         };
 
+    //lambda function used to load a new level
     auto loadLevelIndex = [&](int index) {
         if (isHolding) erasePreview();
         isHolding = false;
@@ -222,7 +239,7 @@ int main() {
                         dy
                     );
 
-                    if (board.hasWon == true) {
+                    if (board.hasWon == true) { // if we have won the current level
                         erasePreview();
                         isHolding = false;
                         previewGlyphs.clear();
@@ -230,7 +247,23 @@ int main() {
                         previewLen = 0;
                         state = GameState::Won;
 
-                        // Optional: print a banner line before redraw()
+                        ScoreEntry& best = scores[currentLevel]; // create a single ScoreEntry called best and set it to the current level index
+                        bool isBetter = false; // bool to check if moves are less than stores moves
+
+                        if (best.bestMoves == std::numeric_limits<int>::max()) {
+                            isBetter = true; // no previous score
+                        }
+                        else if (currentMoves < best.bestMoves) { // if the current moves is less than stores moves, replace storeed moves with current
+                            isBetter = true; // sets is better to true;
+                        }
+                        
+
+                        if (isBetter) { // if isBetter is true
+                            best.bestMoves = currentMoves; // sets the current best moves at current level to the current moves for that level
+                            
+                            saveScores(scores, ScoreFile); // call the saveScores function to save score for current level
+                        }
+
                         std::cout << std::endl;
                         std::cout << "Solved: " << currentLevel + 1 << " out of " << levelCount() << " levels! Press Enter for next level." << std::endl;
                         continue;
