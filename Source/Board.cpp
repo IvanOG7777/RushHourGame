@@ -46,7 +46,7 @@ static inline std::string getColorSGR(int pieceId, int redCarId) { // pass in th
 // set to static so only board.cpp can see and use it
 // set to inline so the compiler is allowed to substitute the body directly at call sites
 // Function is used to decide which ANSI color code to use
-static inline void beginCellStyle(int pieceId, bool isCursor, bool isPreview, int redCarId) { // takes in thge pieceID, isCusor, isPreview and redCarID as parameteres
+static inline void beginCellStyle(int pieceId, bool isCursor, int redCarId) { // takes in thge pieceID, isCusor, isPreview and redCarID as parameteres
     const std::string sgr = getColorSGR(pieceId, redCarId); // will set sgr to a string number from getColorSRG function. Ex:  "95";
     if (!sgr.empty()) std::cout << "\033[" << sgr << "m";  // set color
     if (isCursor)      std::cout << "\033[7m";             // sets the cursor to the current piece color
@@ -73,26 +73,25 @@ Board::Board(int passedHeight, int passedWidth) : height(passedHeight), width(pa
 //function used to print board
 void Board::printBoard(int cursorX, int cursorY) {
 
-    if (grid.empty() || grid[0].empty()) return;
+    if (grid.empty() || grid[0].empty()) return; // if the grid is empty return
 
+    // gets the size of the rows and cols and casts them to ints
     int rows = static_cast<int>(grid.size());
     int cols = static_cast<int>(grid[0].size());
 
+    // nested for loop to loop through cells in the board
     for (int row = 0; row < rows; row++) {
         for (int col = 0; col < cols; col++) {
-            const char ch = grid[row][col];
-            const int pid = idGrid[row][col];
-            const bool isCursor = (col == cursorX && row == cursorY);
+            const char ch = grid[row][col]; // sets ch to current charater at board[row][col]
+            const int pieceId = idGrid[row][col]; // sets the piece ID to int at idGrid[row][col]
+            const bool isCursor = (col == cursorX && row == cursorY); // returns true or false if current cell at [row][col] matches the cursors x/y values
 
-            bool isPreview = false;
-
-            beginCellStyle(pid, isCursor, isPreview, redCarId);
-            std::cout << ch;
-            endCellStyle();
-            std::cout << ' ';
-
+            beginCellStyle(pieceId, isCursor, redCarId); //sends ANSI codes to set the cell’s text color, dimness, and cursor highlight.
+            std::cout << ch; // prints charater
+            endCellStyle(); // resets styles so they don’t “bleed” into the next cell.
+            std::cout << ' '; // prints space
         }
-        std::cout << std::endl;
+        std::cout << std::endl; // ends the row
     }
 }
 
@@ -402,6 +401,7 @@ HeldPiece Board::grabPiece(std::vector<std::vector<int>> &board, int xCoord, int
     return result;
 }
 
+// function used to place a car piece
 void Board::placeCarPiece(Car &car, std::vector<std::vector<char> > &board, std::vector<std::vector <int>>& idBoard, int xCoord, int yCoord, bool isVertical) {
      if (collides(car.carVector, board, idBoard, xCoord, yCoord, isVertical) == true) {
             std::cout << "Cant place piece at:" << xCoord << ',' << yCoord << std::endl;
@@ -488,6 +488,7 @@ void Board::placeCarPiece(Car &car, std::vector<std::vector<char> > &board, std:
         }
 }
 
+// function used to place a truck piece
 void Board::placeTruckPiece(Truck &truck, std::vector<std::vector<char> > &board, std:: vector<std::vector<int>> &idBoard, int xCoord, int yCoord, bool isVertical) {
      if (collides(truck.truckVector, board, idBoard, xCoord, yCoord, isVertical) == true) {
             std::cout << "Cant place piece at:" << xCoord << ',' << yCoord << std::endl;
@@ -681,15 +682,18 @@ void Board::cancelHold() {
     held = {};
 }
 
+// function used to reset the game to inital state
 void Board::reset() {
-    grid = initializeBoard();
-    idGrid = initializeIdBoard();
-    held = {};
+    grid = initializeBoard(); // reinitalizes the char grid
+    idGrid = initializeIdBoard(); // reinitalizes the int grid
+    held = {}; // resetes valeus in held if held had previous inputs
 }
 
-void Board::loadLevel(const Level &level) {
-    reset();
+// function used to load a new level
+void Board::loadLevel(const Level &level) { // passes in a reference of the vector of levels in Level class
+    reset();// reset the board before loadind new level
 
+    // for loop and if statments to place the pieces in the new level onto the board
     for (const auto& piece : level.pieces) {
         if (piece.kind == PieceKind::Truck) {
             Truck truck(piece.id);
