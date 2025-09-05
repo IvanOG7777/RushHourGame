@@ -23,14 +23,6 @@ int main() {
 
     int currentLevel = 0;
     int currentMoves = 0;
-    using clock_t = std::chrono::steady_clock;
-    using secondsDuration = std::chrono::duration<double>;
-    clock_t::time_point levelStart;
-    secondsDuration elapsedBeforePause{ 0.0 };
-    bool isTimerRunning = false;
-    double lastLevelTimeSeconds = 0.0;
-    auto lastFrame = clock_t::now();
-    const auto frameTime = std::chrono::milliseconds(100);
 
     bool running = true;
     Board board(BOARD_HEIGHT, BOARD_WIDTH);
@@ -231,9 +223,6 @@ int main() {
                     );
 
                     if (board.hasWon == true) {
-                        auto now = clock_t::now();
-                        lastLevelTimeSeconds = std::chrono::duration_cast<secondsDuration>((now - levelStart) + elapsedBeforePause).count();
-                        isTimerRunning = false;
                         erasePreview();
                         isHolding = false;
                         previewGlyphs.clear();
