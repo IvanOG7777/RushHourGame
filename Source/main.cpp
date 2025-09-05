@@ -225,7 +225,7 @@ int main() {
 
                     // Optional: print a banner line before redraw()
                     std::cout << std::endl;
-                    std::cout << "Solved! Press Enter for next level." << std::endl;
+                    std::cout << "Solved: " << currentLevel + 1 << " out of " << levelCount() << " levels! Press Enter for next level." << std::endl;
                     continue;
                 }
 

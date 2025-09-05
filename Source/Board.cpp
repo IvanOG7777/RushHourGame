@@ -10,12 +10,16 @@
 #include  <map>
 #include <windows.h>
 
-bool useColor = true;
-std:: string redSGR = "31";
-std::vector<std:: string> palette = { "34", "32", "36", "33", "35", "94", "92", "96", "93", "95", "90" };
+bool useColor = true; // master switch to turn a color on/off from palette
+std:: string redSGR = "31"; /// default red car ANSI  color. SGR == Select Graphic Rendition
+std::vector<std:: string> palette = { "34", "32", "36", "33", "35", "94", "92", "96", "93", "95", "90" }; // array of strings. Each 'number' is a different ANSI color value
 
+// enables the virtual terminal once at initalization of game
+// set to static so only board.cpp file can use it.
+// also set to inline so the compiler is allowed to substitute the body directly at call sites
+//fucntion allows for ANSI Colors if not set but default
 static inline void enableVTOnce() {
-    static bool done = false;
+    static bool done = false; // local static keeps its value across calls
     if (done) return;
 
     done = true;
@@ -28,21 +32,27 @@ static inline void enableVTOnce() {
     SetConsoleMode(hOut, mode);
 }
 
-static inline std::string getColorSGR(int pieceId, int redCarId) {
-    if (!useColor || pieceId == 0) return "";
-    if (pieceId == redCarId) return redSGR; // keep goal car red
-    const size_t n = palette.size();
-    const size_t idx = static_cast<size_t>(pieceId) % (n == 0 ? 1 : n);
-    return n ? palette[idx] : "";
+// set to static so only board.cpp can see and use it
+// set to inline so the compiler is allowed to substitute the body directly at call sites
+// fucntion
+static inline std::string getColorSGR(int pieceId, int redCarId) { // pass in the selected piece id and the redCarID
+    if (!useColor || pieceId == 0) return ""; // if the master switch is false 'off' or pieceID == 0 return empty string for ANSI color
+    if (pieceId == redCarId) return redSGR; // if the piece id == the redcarID return default red car color string above
+    const size_t colorsInPallete = palette.size(); // sets up the colorsInPallete to the amount of colors in the pallete vector
+    const size_t index = static_cast<size_t>(pieceId) % (colorsInPallete == 0 ? 1 : colorsInPallete); //converts piece id from int -> size_t, if colorsInPallete is 0 use 1 as modulo else use the size of colorsInPallete
+    return colorsInPallete ? palette[index] : ""; // if colorsInPallte is greater than 0 return pallete at current index else return empty string
 }
 
-static inline void beginCellStyle(int pieceId, bool isCursor, bool isPreview, int redCarId) {
-    const std::string sgr = getColorSGR(pieceId, redCarId);
+// set to static so only board.cpp can see and use it
+// set to inline so the compiler is allowed to substitute the body directly at call sites
+// Function is used to decide which ANSI color code to use
+static inline void beginCellStyle(int pieceId, bool isCursor, bool isPreview, int redCarId) { // takes in thge pieceID, isCusor, isPreview and redCarID as parameteres
+    const std::string sgr = getColorSGR(pieceId, redCarId); // will set sgr to a string number from getColorSRG function. Ex:  "95";
     if (!sgr.empty()) std::cout << "\033[" << sgr << "m";  // set color
-    if (isPreview)     std::cout << "\033[2m";             // dim (optional)
-    if (isCursor)      std::cout << "\033[7m";             // reverse video
+    if (isCursor)      std::cout << "\033[7m";             // sets the cursor to the current piece color
 }
 
+//resets all styles (color, dim, reverse, etc.), so the next cell starts fresh.
 static inline void endCellStyle() {
     std::cout << "\033[0m";
 }
@@ -51,6 +61,7 @@ static inline void endCellStyle() {
 
 Board::Board(int passedHeight, int passedWidth) : height(passedHeight), width(passedWidth) { // passes the height nad width of map
 
+    // sets terminal to allow use of ASNI colors on initalization of game
     enableVTOnce();
 
     //initializes the char grid and id grid
